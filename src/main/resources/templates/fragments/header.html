@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body th:fragment="header(title)">
+    <div class="top-bar">
+        <div class="top-bar-left">
+            <button class="mobile-toggle" aria-label="Abrir menú">
+                &#9776;
+            </button>
+            <div>
+                <h1 th:text="${title}">Título</h1>
+                <p style="color: #7A7A7A; font-size: 14px;" th:if="${nombre != null}">
+                    Bienvenido, <span th:text="${nombre}"></span>
+                </p>
+            </div>
+        </div>
+        <div class="user-info" th:if="${nombre != null}">
+            <span class="user-email" style="color: #7A7A7A; font-size: 14px;" th:text="${email}">correo</span>
+            <div class="user-avatar" th:text="${#strings.substring(nombre, 0, 1)}"></div>
+        </div>
+    </div>
+</body>
+</html>

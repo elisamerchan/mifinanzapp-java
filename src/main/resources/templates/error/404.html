@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Mi FinanzApp</title>
+    <link rel="stylesheet" th:href="@{/vendor/bootstrap.min.css}">
+    <style>
+        :root {
+            --primary: #6E71C4;
+            --text-secondary: #7A7A7A;
+        }
+        .error-page { display: flex; align-items: center; justify-content: center; min-height: 100vh; text-align: center; padding: 24px; }
+        .error-code { font-size: 96px; font-weight: 800; color: var(--primary); line-height: 1; margin-bottom: 8px; }
+        .error-title { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+        .error-message { color: var(--text-secondary); margin-bottom: 24px; font-size: 16px; }
+        .btn-back { background: #6E71C4; color: white; border: none; border-radius: 10px; padding: 10px 20px; font-weight: 600; font-size: 14px; text-decoration: none; display: inline-block; }
+        .btn-back:hover { background: #5D60B0; color: white; }
+    </style>
+</head>
+<body>
+    <div class="error-page">
+        <div>
+            <div class="error-code">404</div>
+            <div class="error-title">Página no encontrada</div>
+            <div class="error-message" th:text="${error} ?: 'La página que buscas no existe o ha sido movida.'"></div>
+            <a th:href="@{/dashboard}" class="btn-back">Volver al inicio</a>
+        </div>
+    </div>
+</body>
+</html>

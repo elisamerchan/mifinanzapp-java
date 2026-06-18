@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:replace="~{fragments/head :: head('Historial')}"></head>
+<body>
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    <div class="main-content">
+        <div th:replace="~{fragments/header :: header('Historial de movimientos')}"></div>
+
+        <div class="row g-4">
+            <div class="col-12 col-lg-9">
+                <div class="card-dashboard mb-4">
+                    <form method="get" class="filters-bar">
+                        <div>
+                            <label style="font-size: 12px; color: #7A7A7A; font-weight: 600;">Desde</label>
+                            <input type="date" name="desde" class="form-control" th:value="${desde}">
+                        </div>
+                        <div>
+                            <label style="font-size: 12px; color: #7A7A7A; font-weight: 600;">Hasta</label>
+                            <input type="date" name="hasta" class="form-control" th:value="${hasta}">
+                        </div>
+                        <div>
+                            <label style="font-size: 12px; color: #7A7A7A; font-weight: 600;">Categoría</label>
+                            <select name="categoriaId" class="form-select">
+                                <option value="">Todas</option>
+                                <option th:each="cat : ${categorias}" th:value="${cat.id}" th:text="${cat.icono != null} ? ${cat.icono + ' ' + cat.nombre} : ${cat.nombre}" th:selected="${categoriaId == cat.id}"></option>
+                            </select>
+                        </div>
+                        <div style="align-self: flex-end;">
+                            <button type="submit" class="btn-primary-custom" style="padding: 8px 20px;">Filtrar</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card-dashboard">
+                    <div class="table-responsive">
+                        <table class="table table-dashboard">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Tipo</th>
+                                    <th>Categoría</th>
+                                    <th>Descripción</th>
+                                    <th>Monto</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="m : ${movimientos}">
+                                    <td th:text="${m.fecha}"></td>
+                                    <td>
+                                        <span th:if="${m.tipo == 'INGRESO'}" class="badge-income">💰 Ingreso</span>
+                                        <span th:if="${m.tipo == 'GASTO'}" class="badge-expense">💳 Gasto</span>
+                                    </td>
+                                    <td th:text="${m.categoria}"></td>
+                                    <td th:text="${m.descripcion}"></td>
+                                    <td th:text="${m.montoStr}" th:style="${m.tipo == 'INGRESO'} ? 'color:#4CAF50;font-weight:600;' : 'color:#E53935;font-weight:600;'"></td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(movimientos)}">
+                                    <td colspan="5" class="text-center" style="color: #7A7A7A; padding: 32px;">No hay movimientos en este período</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-lg-3">
+                <div class="card-dashboard mb-3">
+                    <div class="card-title mb-3">Resumen del período</div>
+                    <div style="padding: 12px 0; border-bottom: 1px solid #F0F0F0;">
+                        <div style="font-size: 12px; color: #7A7A7A;">Ingresos</div>
+                        <div style="font-size: 20px; font-weight: 700; color: #4CAF50;" th:text="${totalIngresosStr}"></div>
+                    </div>
+                    <div style="padding: 12px 0; border-bottom: 1px solid #F0F0F0;">
+                        <div style="font-size: 12px; color: #7A7A7A;">Gastos</div>
+                        <div style="font-size: 20px; font-weight: 700; color: #E53935;" th:text="${totalGastosStr}"></div>
+                    </div>
+                    <div style="padding: 12px 0;">
+                        <div style="font-size: 12px; color: #7A7A7A;">Balance</div>
+                        <div style="font-size: 24px; font-weight: 700;" th:text="${balanceStr}" th:style="${balance < 0} ? 'color: #E53935;' : 'color: #4CAF50;'"></div>
+                    </div>
+                </div>
+                <div class="card-dashboard text-center" style="padding: 16px;">
+                    <a th:href="@{/movimientos/nuevo}" class="btn-primary-custom w-100">+ Nuevo movimiento</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div th:replace="~{fragments/scripts :: scripts}"></div>
+</body>
+</html>

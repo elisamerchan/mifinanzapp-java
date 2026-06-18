@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar sesión - Mi FinanzApp</title>
+    <link rel="stylesheet" th:href="@{/vendor/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <link rel="stylesheet" th:href="@{/css/components/cards.css}">
+    <link rel="stylesheet" th:href="@{/css/components/forms.css}">
+    <link rel="stylesheet" th:href="@{/css/components/buttons.css}">
+</head>
+<body class="bg-light">
+    <div class="container">
+        <div class="row justify-content-center align-items-center min-vh-100">
+            <div class="col-11 col-sm-8 col-md-6 col-lg-4">
+                <div class="text-center mb-4">
+                    <div class="d-inline-flex align-items-center justify-content-center" style="width: 64px; height: 64px; background: #6E71C4; border-radius: 16px;">
+                        <span style="color: white; font-weight: 700; font-size: 24px;">M</span>
+                    </div>
+                    <h2 class="mt-3" style="color: #2B2B2B;">Mi FinanzApp</h2>
+                    <p style="color: #7A7A7A;">Inicia sesión en tu cuenta</p>
+                </div>
+
+                <div class="card" style="border: none; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.06);">
+                    <div class="card-body p-4">
+
+                        <div th:if="${param.registro != null}" class="alert alert-success py-2" style="border-radius: 10px; font-size: 14px;">
+                            Registro exitoso. Inicia sesión.
+                        </div>
+
+                        <div th:if="${param.error != null}" class="alert alert-danger py-2" style="border-radius: 10px; font-size: 14px;">
+                            Email o contraseña incorrectos.
+                        </div>
+
+                        <div th:if="${param.logout != null}" class="alert alert-info py-2" style="border-radius: 10px; font-size: 14px;">
+                            Has cerrado sesión correctamente.
+                        </div>
+
+                        <form th:action="@{/auth/login}" method="post">
+                            <div class="mb-3">
+                                <label class="form-label" style="color: #2B2B2B; font-weight: 500; font-size: 14px;">Email</label>
+                                <input type="email" name="username" class="form-control" placeholder="tu@email.com" required style="border-radius: 10px; padding: 10px 14px; border: 1.5px solid #E0E0E0;">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" style="color: #2B2B2B; font-weight: 500; font-size: 14px;">Contraseña</label>
+                                <input type="password" name="password" class="form-control" placeholder="••••••••" required style="border-radius: 10px; padding: 10px 14px; border: 1.5px solid #E0E0E0;">
+                            </div>
+                            <button type="submit" class="btn w-100 py-2" style="background: #6E71C4; color: white; border-radius: 10px; font-weight: 600; border: none;">
+                                Iniciar sesión
+                            </button>
+                        </form>
+
+                        <p class="text-center mt-3 mb-0" style="color: #7A7A7A; font-size: 14px;">
+                            ¿No tienes cuenta?
+                            <a th:href="@{/auth/registro}" style="color: #6E71C4; text-decoration: none; font-weight: 500;">Regístrate</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,16 @@
+/* === BUTTONS === */
+.btn-primary-custom {
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: background 0.2s;
+}
+
+.btn-primary-custom:hover {
+    background: #5D60B0;
+    color: white;
+}

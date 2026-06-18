@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:replace="~{fragments/head :: head('Reportes')}"></head>
+<body>
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    <div class="main-content">
+        <div th:replace="~{fragments/header :: header('Reportes y análisis')}"></div>
+
+        <div class="d-flex gap-2 mb-4">
+            <a th:href="@{/reportes(periodo=mensual)}" class="btn btn-sm" th:classappend="${periodo == 'mensual'} ? 'btn-primary-custom' : ''" style="border-radius: 20px; padding: 6px 16px; font-size: 13px; text-decoration: none;">Mensual</a>
+            <a th:href="@{/reportes(periodo=semanal)}" class="btn btn-sm" th:classappend="${periodo == 'semanal'} ? 'btn-primary-custom' : ''" style="border-radius: 20px; padding: 6px 16px; font-size: 13px; border: 1.5px solid #E0E0E0; text-decoration: none;">Semanal</a>
+            <a th:href="@{/reportes(periodo=anual)}" class="btn btn-sm" th:classappend="${periodo == 'anual'} ? 'btn-primary-custom' : ''" style="border-radius: 20px; padding: 6px 16px; font-size: 13px; border: 1.5px solid #E0E0E0; text-decoration: none;">Anual</a>
+            <a th:href="@{/reportes(periodo=fecha)}" class="btn btn-sm" th:classappend="${periodo == 'fecha'} ? 'btn-primary-custom' : ''" style="border-radius: 20px; padding: 6px 16px; font-size: 13px; border: 1.5px solid #E0E0E0; text-decoration: none;">Último mes</a>
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-12 col-sm-4">
+                <div class="card-dashboard text-center">
+                    <div class="card-title">Total Ingresos</div>
+                    <div class="card-value income" th:text="${'$' + #numbers.formatDecimal(totalIngresos, 0, 'COMMA', 2, 'POINT')}">$0.00</div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-4">
+                <div class="card-dashboard text-center">
+                    <div class="card-title">Total Gastos</div>
+                    <div class="card-value expense" th:text="${'$' + #numbers.formatDecimal(totalGastos, 0, 'COMMA', 2, 'POINT')}">$0.00</div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-4">
+                <div class="card-dashboard text-center">
+                    <div class="card-title">Balance</div>
+                    <div class="card-value" th:text="${'$' + #numbers.formatDecimal(balance, 0, 'COMMA', 2, 'POINT')}" th:style="${balance < 0} ? 'color: #E53935;' : ''"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-lg-3">
+                <div class="card-dashboard text-center" style="padding: 16px;">
+                    <div style="font-size: 24px; margin-bottom: 4px;">📊</div>
+                    <div class="card-title" style="font-size: 11px;">Movimientos</div>
+                    <div style="font-size: 22px; font-weight: 700;" th:text="${totalMovimientos}">0</div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="card-dashboard text-center" style="padding: 16px;">
+                    <div style="font-size: 24px; margin-bottom: 4px;">💸</div>
+                    <div class="card-title" style="font-size: 11px;">Mayor gasto</div>
+                    <div style="font-size: 14px; font-weight: 700; color: #E53935;" th:text="${'$' + #numbers.formatDecimal(maxGasto, 0, 'COMMA', 2, 'POINT')}">$0</div>
+                    <div style="font-size: 11px; color: #7A7A7A;" th:text="${diaMayorGasto}"></div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="card-dashboard text-center" style="padding: 16px;">
+                    <div style="font-size: 24px; margin-bottom: 4px;">🏦</div>
+                    <div class="card-title" style="font-size: 11px;">Gasto promedio/día</div>
+                    <div style="font-size: 18px; font-weight: 700;" th:text="${'$' + #numbers.formatDecimal(gastoPromedioDiario, 0, 'COMMA', 2, 'POINT')}">$0</div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="card-dashboard text-center" style="padding: 16px;">
+                    <div style="font-size: 24px; margin-bottom: 4px;">🎯</div>
+                    <div class="card-title" style="font-size: 11px;">% Ahorrado</div>
+                    <div style="font-size: 18px; font-weight: 700;" th:text="${porcentajeAhorro + '%'}" th:style="${porcentajeAhorro < 0} ? 'color: #E53935;' : 'color: #4CAF50;'"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-12 col-lg-6">
+                <div class="card-dashboard">
+                    <div class="card-title mb-3">Gastos por categoría</div>
+                    <canvas id="chartGastos" height="250"></canvas>
+                </div>
+            </div>
+            <div class="col-12 col-lg-6">
+                <div class="card-dashboard">
+                    <div class="card-title mb-3">Evolución mensual de gastos</div>
+                    <canvas id="chartEvolucion" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/vendor/chart.umd.min.js}"></script>
+    <script th:inline="javascript">
+        const labels = /*[[${labels}]]*/ [];
+        const data = /*[[${data}]]*/ [];
+        const meses = /*[[${meses}]]*/ [];
+        const montos = /*[[${montos}]]*/ [];
+
+        if (labels.length > 0) {
+            new Chart(document.getElementById('chartGastos'), {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: ['#6E71C4', '#A5A7E8', '#4CAF50', '#E53935', '#FF9800', '#00BCD4', '#9C27B0', '#FF5722'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { position: 'bottom', labels: { padding: 16, usePointStyle: true } } }
+                }
+            });
+        }
+
+        if (meses.length > 0) {
+            new Chart(document.getElementById('chartEvolucion'), {
+                type: 'line',
+                data: {
+                    labels: meses,
+                    datasets: [{
+                        label: 'Gastos',
+                        data: montos,
+                        borderColor: '#6E71C4',
+                        backgroundColor: 'rgba(110, 113, 196, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#6E71C4'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: '#F0F0F0' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+    </script>
+    <div th:replace="~{fragments/scripts :: scripts}"></div>
+</body>
+</html>

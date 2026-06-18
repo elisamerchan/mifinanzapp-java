@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:replace="~{fragments/head :: head('Dashboard')}">
+</head>
+<body>
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <div class="main-content">
+        <div th:replace="~{fragments/header :: header('Dashboard')}"></div>
+
+        <!-- === TARJETAS RESUMEN === -->
+        <div class="row g-3 mb-4">
+            <div class="col-12 col-sm-6 col-lg-3">
+                <div class="card-dashboard fade-in">
+                    <div style="font-size: 24px; margin-bottom: 4px;">💰</div>
+                    <div class="card-title">Ingresos del mes</div>
+                    <div class="card-value income" th:text="${'$' + #numbers.formatDecimal(totalIngresos, 0, 'COMMA', 2, 'POINT')}">$0.00</div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-lg-3">
+                <div class="card-dashboard fade-in">
+                    <div style="font-size: 24px; margin-bottom: 4px;">💳</div>
+                    <div class="card-title">Gastos del mes</div>
+                    <div class="card-value expense" th:text="${'$' + #numbers.formatDecimal(totalGastos, 0, 'COMMA', 2, 'POINT')}">$0.00</div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-lg-3">
+                <div class="card-dashboard fade-in">
+                    <div style="font-size: 24px; margin-bottom: 4px;">🏦</div>
+                    <div class="card-title">Balance disponible</div>
+                    <div class="card-value" th:text="${'$' + #numbers.formatDecimal(balance, 0, 'COMMA', 2, 'POINT')}" th:style="${balance < 0} ? 'color: #E53935;' : ''">$0.00</div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-lg-3">
+                <div class="card-dashboard fade-in">
+                    <div style="font-size: 24px; margin-bottom: 4px;">📊</div>
+                    <div class="card-title">Total movimientos</div>
+                    <div class="card-value" style="font-size: 24px;" th:text="${totalMovimientos}">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- === MÉTRICAS === -->
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-lg-3 d-flex">
+                <div class="card-dashboard text-center flex-fill">
+                    <div style="font-size: 13px; color: #7A7A7A; font-weight: 600;">🎯 % Ahorrado</div>
+                    <div style="font-size: 22px; font-weight: 700;" th:text="${porcentajeAhorro + '%'}" th:style="${porcentajeAhorro < 0} ? 'color: #E53935;' : 'color: #4CAF50;'"></div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3 d-flex">
+                <div class="card-dashboard text-center flex-fill">
+                    <div style="font-size: 13px; color: #7A7A7A; font-weight: 600;">📆 Gasto promedio/día</div>
+                    <div style="font-size: 22px; font-weight: 700; color: #E53935;" th:text="${'$' + #numbers.formatDecimal(gastoPromedioDiario, 0, 'COMMA', 2, 'POINT')}">$0</div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3 d-flex">
+                <div class="card-dashboard text-center flex-fill">
+                    <div style="font-size: 13px; color: #7A7A7A; font-weight: 600;">💸 Mayor gasto del mes</div>
+                    <div style="font-size: 16px; font-weight: 700; color: #E53935;" th:if="${diaMayorGasto != null}" th:text="${'$' + #numbers.formatDecimal(diaMayorGasto.monto, 0, 'COMMA', 2, 'POINT')}">$0</div>
+                    <div style="font-size: 11px; color: #7A7A7A;" th:if="${diaMayorGasto != null}" th:text="${diaMayorGasto.dia}"></div>
+                    <div style="font-size: 13px; color: #7A7A7A;" th:unless="${diaMayorGasto != null}">Sin datos</div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3 d-flex">
+                <div class="card-dashboard text-center flex-fill">
+                    <div style="font-size: 13px; color: #7A7A7A; font-weight: 600;">🏆 Categoría mayor gasto</div>
+                    <div style="font-size: 16px; font-weight: 700;" th:text="${categoriaMayorGasto}">N/A</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- === GRÁFICO MENSUAL === -->
+        <div class="card-dashboard mb-4">
+            <div class="card-title mb-3">📈 Evolución mensual (ingresos vs gastos)</div>
+            <canvas id="chartDashboard" height="100"></canvas>
+        </div>
+
+        <!-- === PRESUPUESTOS === -->
+        <div class="card-dashboard mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="card-title mb-0">Presupuestos del mes</div>
+                <a th:href="@{/presupuestos}" class="btn btn-sm" style="color: #6E71C4; font-weight: 600; text-decoration: none;">Ver todos</a>
+            </div>
+            <div th:if="${#lists.isEmpty(presupuestos)}" class="empty-state">
+                <div class="empty-icon">&#128202;</div>
+                <p>No hay presupuestos definidos para este mes</p>
+                <a th:href="@{/presupuestos}" class="btn-primary-custom btn-sm" style="padding: 8px 16px; font-size: 13px;">Crear presupuesto</a>
+            </div>
+            <div th:each="p : ${presupuestos}" class="mb-3">
+                <div class="d-flex justify-content-between mb-1">
+                    <span style="font-size: 14px; font-weight: 500;" th:text="${p.categoria}"></span>
+                    <span style="font-size: 13px; color: #7A7A7A;" th:text="${p.porcentaje + '%'}"></span>
+                </div>
+                <div class="progress-custom">
+                    <div class="progress-bar" role="progressbar" style="width: 0%; background: #4CAF50;" th:style="${'width: ' + (p.porcentaje > 100 ? 100 : p.porcentaje) + '%; background: ' + (p.excedido ? '#E53935' : '#4CAF50') + ';'}"></div>
+                </div>
+                <div style="font-size: 12px; color: #7A7A7A; margin-top: 2px;" th:text="${'$' + #numbers.formatDecimal(p.gastado, 0, 'COMMA', 2, 'POINT') + ' de $' + #numbers.formatDecimal(p.limite, 0, 'COMMA', 2, 'POINT')}"></div>
+            </div>
+        </div>
+
+        <!-- === ACCIONES RÁPIDAS === -->
+        <div class="row g-3 mb-4">
+            <div class="col-12 col-sm-6 col-lg-3">
+                <a th:href="@{/movimientos/nuevo}" style="text-decoration: none;">
+                    <div class="card-dashboard text-center" style="cursor: pointer; border-left: 4px solid #4CAF50;">
+                        <div style="font-size: 28px; margin-bottom: 4px;">💰</div>
+                        <div style="font-size: 13px; font-weight: 600; color: #4CAF50;">Registrar ingreso</div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-12 col-sm-6 col-lg-3">
+                <a th:href="@{/movimientos/nuevo}" style="text-decoration: none;">
+                    <div class="card-dashboard text-center" style="cursor: pointer; border-left: 4px solid #E53935;">
+                        <div style="font-size: 28px; margin-bottom: 4px;">💳</div>
+                        <div style="font-size: 13px; font-weight: 600; color: #E53935;">Registrar gasto</div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-12 col-sm-6 col-lg-3">
+                <a th:href="@{/categorias}" style="text-decoration: none;">
+                    <div class="card-dashboard text-center" style="cursor: pointer; border-left: 4px solid #6E71C4;">
+                        <div style="font-size: 28px; margin-bottom: 4px;">📂</div>
+                        <div style="font-size: 13px; font-weight: 600; color: #6E71C4;">Gestionar categorías</div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-12 col-sm-6 col-lg-3">
+                <a th:href="@{/reportes}" style="text-decoration: none;">
+                    <div class="card-dashboard text-center" style="cursor: pointer; border-left: 4px solid #FF9800;">
+                        <div style="font-size: 28px; margin-bottom: 4px;">📊</div>
+                        <div style="font-size: 13px; font-weight: 600; color: #FF9800;">Ver reportes</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- === CONSEJO DEL DÍA === -->
+        <div class="card-dashboard mb-4" style="background: linear-gradient(135deg, #6E71C4, #2F3264); color: white;">
+            <div class="d-flex align-items-center gap-3">
+                <div style="font-size: 32px;">💡</div>
+                <div>
+                    <div style="font-size: 12px; opacity: 0.8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Consejo del día</div>
+                    <div style="font-size: 15px; font-weight: 500;" th:text="${consejo}"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- === MOVIMIENTOS RECIENTES === -->
+        <div class="card-dashboard">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="card-title mb-0">Movimientos recientes</div>
+                <a th:href="@{/historial}" class="btn btn-sm" style="color: #6E71C4; font-weight: 600; text-decoration: none;">Ver historial</a>
+            </div>
+            <div th:if="${#lists.isEmpty(movimientosRecientes)}" class="empty-state">
+                <div class="empty-icon">&#128203;</div>
+                <p>No hay movimientos registrados este mes</p>
+            </div>
+            <div th:if="${not #lists.isEmpty(movimientosRecientes)}" class="table-responsive">
+                <table class="table table-dashboard">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Categoría</th>
+                            <th>Descripción</th>
+                            <th>Monto</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="g : ${movimientosRecientes}">
+                            <td th:text="${g.fecha}"></td>
+                            <td th:text="${g.categoria.nombre}"></td>
+                            <td th:text="${g.descripcion}"></td>
+                            <td th:text="${g.montoStr}" th:style="${g.tipo == 'INGRESO'} ? 'color:#4CAF50;font-weight:600;' : 'color:#E53935;font-weight:600;'"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        window.evLabels = /*[[${evolucionMensual.labels}]]*/ [];
+        window.evGastos = /*[[${evolucionMensual.gastos}]]*/ [];
+        window.evIngresos = /*[[${evolucionMensual.ingresos}]]*/ [];
+    </script>
+    <div th:replace="~{fragments/scripts :: scripts}"></div>
+</body>
+</html>

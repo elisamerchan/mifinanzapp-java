@@ -1,0 +1,589 @@
+# PROMPT MAESTRO DE DESARROLLO - MI FINANZAPP
+
+## OBJETIVO GENERAL
+
+Desarrollar una aplicación web responsive llamada "Mi FinanzApp" para la gestión de finanzas personales.
+
+La aplicación permitirá:
+
+* Registro e inicio de sesión de usuarios.
+* Gestión de ingresos.
+* Gestión de gastos.
+* Gestión de categorías personalizadas.
+* Gestión de presupuestos mensuales.
+* Dashboard financiero.
+* Historial de movimientos.
+* Reportes y análisis.
+* Recordatorios financieros.
+* Contenido educativo.
+
+El sistema debe desarrollarse utilizando Java Spring Boot, PostgreSQL (Supabase), Thymeleaf y Bootstrap.
+
+La arquitectura debe seguir buenas prácticas de desarrollo empresarial utilizando capas Controller, Service, Repository y Entity.
+
+---
+
+# STACK TECNOLÓGICO
+
+Backend:
+
+* Java 21
+* Spring Boot 3
+* Spring Security
+* Spring Data JPA
+* Hibernate
+* Maven
+
+Frontend:
+
+* Thymeleaf
+* Bootstrap 5
+* HTML5
+* CSS3
+* JavaScript
+
+Base de datos:
+
+* PostgreSQL
+* Supabase
+
+Control de versiones:
+
+* Git
+* GitHub
+
+---
+
+# ESTRUCTURA DEL PROYECTO
+
+Generar la siguiente estructura:
+
+src/main/java/com/mifinanzapp
+
+config/
+controller/
+service/
+repository/
+entity/
+dto/
+security/
+util/
+
+src/main/resources
+
+templates/
+static/css/
+static/js/
+static/img/
+
+application.properties
+
+---
+
+# CONFIGURACIÓN DE VARIABLES DE ENTORNO
+
+NO almacenar credenciales directamente en application.properties.
+
+Utilizar variables de entorno.
+
+application.properties:
+
+spring.datasource.url=${DB_URL}
+spring.datasource.username=${DB_USER}
+spring.datasource.password=${DB_PASSWORD}
+
+spring.jpa.hibernate.ddl-auto=update
+
+Crear archivo .env.example:
+
+DB_URL=
+DB_USER=
+DB_PASSWORD=
+
+---
+
+# CONFIGURACIÓN DE SUPABASE
+
+La aplicación debe conectarse automáticamente a PostgreSQL de Supabase.
+
+El proyecto debe ser capaz de:
+
+1. Detectar la conexión.
+2. Crear automáticamente las tablas mediante Hibernate.
+3. Actualizar el esquema si existen nuevas entidades.
+
+No se deben crear tablas manualmente.
+
+Las entidades Java serán responsables de generar toda la estructura de la base de datos.
+
+---
+
+# INSTRUCCIONES DE EJECUCIÓN
+
+Al clonar el proyecto:
+
+1. Configurar variables de entorno.
+2. Ejecutar:
+
+mvn clean install
+
+3. Ejecutar:
+
+mvn spring-boot:run
+
+4. Abrir navegador:
+
+http://localhost:8080
+
+---
+
+# SISTEMA DE AUTENTICACIÓN
+
+Crear módulo completo de autenticación.
+
+Funcionalidades:
+
+* Registro
+* Inicio de sesión
+* Cierre de sesión
+* Contraseñas cifradas con BCrypt
+* Protección de rutas
+
+Entidad Usuario:
+
+id
+nombre
+email
+password
+fechaRegistro
+
+---
+
+# MÓDULO DE CATEGORÍAS
+
+Permitir categorías predeterminadas y personalizadas.
+
+Tipos:
+
+INGRESO
+GASTO
+
+Categorías iniciales:
+
+Gastos:
+
+Alimentación
+Transporte
+Salud
+Educación
+Servicios
+Entretenimiento
+
+Ingresos:
+
+Salario
+Freelance
+Ventas
+Bonificaciones
+
+Entidad Categoria:
+
+id
+nombre
+tipo
+usuario
+
+---
+
+# MÓDULO DE INGRESOS
+
+Entidad Ingreso:
+
+id
+usuario
+categoria
+monto
+fecha
+descripcion
+
+Funcionalidades:
+
+* Crear
+* Editar
+* Eliminar
+* Consultar
+
+---
+
+# MÓDULO DE GASTOS
+
+Entidad Gasto:
+
+id
+usuario
+categoria
+monto
+fecha
+descripcion
+metodoPago
+
+Métodos:
+
+Efectivo
+Tarjeta Débito
+Tarjeta Crédito
+Transferencia
+Nequi
+Daviplata
+Otro
+
+Funcionalidades:
+
+* Crear
+* Editar
+* Eliminar
+* Consultar
+
+---
+
+# MÓDULO DE PRESUPUESTOS
+
+Entidad Presupuesto:
+
+id
+usuario
+categoria
+mes
+anio
+montoLimite
+
+Objetivo:
+
+Comparar presupuesto definido contra gastos reales.
+
+Calcular automáticamente:
+
+porcentajeConsumido
+
+---
+
+# DASHBOARD PRINCIPAL
+
+Pantalla principal después del login.
+
+Mostrar:
+
+* Total ingresos del mes
+* Total gastos del mes
+* Balance disponible
+* Categoría con mayor gasto
+* Categorías presupuestadas
+
+Mostrar indicadores visuales.
+
+Mostrar progreso de presupuesto.
+
+Mostrar movimientos recientes.
+
+---
+
+# HISTORIAL
+
+Tabla completa de movimientos.
+
+Columnas:
+
+Fecha
+Tipo
+Categoría
+Descripción
+Monto
+
+Permitir:
+
+* Filtrar por fechas
+* Filtrar por categoría
+* Buscar texto
+* Ordenar registros
+
+---
+
+# REPORTES Y ANÁLISIS
+
+Generar:
+
+* Gastos por categoría
+* Ingresos por categoría
+* Balance mensual
+* Evolución mensual
+
+Preparar estructura para gráficos utilizando Chart.js.
+
+---
+
+# RECORDATORIOS
+
+Entidad Recordatorio:
+
+id
+usuario
+titulo
+descripcion
+fecha
+
+Permitir:
+
+* Crear
+* Editar
+* Eliminar
+
+---
+
+# CONTENIDO EDUCATIVO
+
+Sección informativa.
+
+Mostrar:
+
+* Consejos financieros
+* Educación financiera básica
+* Ahorro
+* Presupuestos
+
+Inicialmente contenido estático.
+
+---
+
+# DISEÑO VISUAL
+
+Tomar como referencia la interfaz adjunta.
+
+Características:
+
+Diseño moderno.
+Minimalista.
+Profesional.
+Fintech.
+
+Inspiración:
+
+Notion
+Linear
+Stripe
+Nubank
+
+---
+
+# PALETA DE COLORES
+
+Sidebar:
+
+#2F3264
+
+Color primario:
+
+#6E71C4
+
+Color secundario:
+
+#A5A7E8
+
+Fondo:
+
+#F6F7FB
+
+Tarjetas:
+
+#FFFFFF
+
+Texto principal:
+
+#2B2B2B
+
+Texto secundario:
+
+#7A7A7A
+
+Ingresos:
+
+#4CAF50
+
+Gastos:
+
+#E53935
+
+---
+
+# SIDEBAR
+
+Sidebar fija escritorio.
+
+Opciones:
+
+Inicio
+Registrar movimiento
+Historial
+Categorías
+Reportes y análisis
+Presupuesto mensual
+Recordatorios
+Contenido educativo
+Configuración
+
+---
+
+# PANTALLA REGISTRAR MOVIMIENTO
+
+Basarse visualmente en la imagen de referencia.
+
+Diseño de dos columnas.
+
+Izquierda:
+
+Formulario.
+
+Derecha:
+
+Resumen dinámico.
+
+Actualizar resumen en tiempo real.
+
+Mostrar:
+
+Tipo
+Monto
+Categoría
+Fecha
+Descripción
+
+Debajo:
+
+Movimientos frecuentes.
+
+---
+
+# RESPONSIVE DESIGN
+
+Desktop:
+
+Sidebar expandida.
+
+Tablet:
+
+Sidebar colapsable.
+
+Mobile:
+
+Menú hamburguesa.
+
+Todos los formularios deben adaptarse.
+
+Todas las tablas deben ser responsive.
+
+Todas las tarjetas deben reorganizarse verticalmente.
+
+---
+
+# LÓGICA DE NEGOCIO
+
+Al registrar un gasto:
+
+1. Asociar categoría.
+2. Buscar presupuesto correspondiente.
+3. Actualizar porcentaje consumido.
+4. Mostrar alerta si supera 100%.
+
+Al registrar un ingreso:
+
+1. Actualizar balance disponible.
+
+Balance:
+
+Balance = Ingresos - Gastos
+
+---
+
+# SEGURIDAD
+
+Implementar:
+
+Spring Security.
+
+BCrypt.
+
+Validaciones backend.
+
+Validaciones frontend.
+
+Protección CSRF.
+
+Protección rutas privadas.
+
+---
+
+# ROADMAP DE DESARROLLO
+
+FASE 1
+
+* Crear proyecto Spring Boot
+* Configurar Maven
+* Configurar Supabase
+* Configurar variables de entorno
+
+FASE 2
+
+* Entidades
+* Repositories
+* Base de datos automática
+
+FASE 3
+
+* Login
+* Registro
+* Seguridad
+
+FASE 4
+
+* CRUD Categorías
+
+FASE 5
+
+* CRUD Ingresos
+
+FASE 6
+
+* CRUD Gastos
+
+FASE 7
+
+* CRUD Presupuestos
+
+FASE 8
+
+* Dashboard
+
+FASE 9
+
+* Historial
+
+FASE 10
+
+* Reportes
+
+FASE 11
+
+* Recordatorios
+
+FASE 12
+
+* Optimización responsive
+
+FASE 13
+
+* Testing
+
+FASE 14
+
+* Documentación final
+
+Generar código completo, limpio, escalable y listo para producción académica.

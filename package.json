@@ -1,0 +1,14 @@
+{
+  "name": "mi-finanzapp-frontend",
+  "version": "1.0.0",
+  "description": "Frontend assets for Mi FinanzApp",
+  "scripts": {
+    "postinstall": "node scripts/copy-vendor.js",
+    "build": "node scripts/copy-vendor.js"
+  },
+  "dependencies": {
+    "bootstrap": "^5.3.3",
+    "chart.js": "^4.4.1",
+    "@popperjs/core": "^2.11.8"
+  }
+}

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:replace="~{fragments/head :: head('Categorías')}"></head>
+<body>
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    <div class="main-content">
+        <div th:replace="~{fragments/header :: header('Categorías')}"></div>
+
+        <div class="row g-4">
+            <div class="col-12 col-lg-4">
+                <div class="card-dashboard">
+                    <div class="card-title mb-3" th:text="${categoria.id != null} ? 'Editar categoría' : 'Nueva categoría'"></div>
+                    <form th:action="@{/categorias/guardar}" th:object="${categoria}" method="post">
+                        <input type="hidden" th:field="*{id}">
+                        <div class="mb-3">
+                            <label class="form-label" style="font-size: 14px; font-weight: 500;">Nombre</label>
+                            <input type="text" th:field="*{nombre}" class="form-control form-custom" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" style="font-size: 14px; font-weight: 500;">Tipo</label>
+                            <select th:field="*{tipo}" class="form-select form-custom" required>
+                                <option value="">Seleccionar...</option>
+                                <option value="INGRESO">Ingreso</option>
+                                <option value="GASTO">Gasto</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" style="font-size: 14px; font-weight: 500;">Icono (emoji)</label>
+                            <div class="emoji-picker" style="display: flex; flex-wrap: wrap; gap: 6px; padding: 10px; border: 1.5px solid #E0E0E0; border-radius: 10px; max-height: 150px; overflow-y: auto;">
+                                <label th:each="ico : ${iconos}" style="cursor: pointer; font-size: 22px; padding: 4px; border-radius: 6px; transition: background 0.2s;" th:styleappend="${categoria.icono == ico} ? 'background: #6E71C4; color: white;' : ''">
+                                    <input type="radio" th:field="*{icono}" th:value="${ico}" style="display: none;" th:checked="${categoria.icono == ico}">
+                                    <span th:text="${ico}"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-primary-custom w-100">
+                            <span th:text="${categoria.id != null} ? 'Actualizar' : 'Guardar'"></span>
+                        </button>
+                        <a th:if="${categoria.id != null}" th:href="@{/categorias}" class="btn w-100 mt-2" style="border-radius: 10px; border: 1.5px solid #E0E0E0;">Cancelar</a>
+                    </form>
+                </div>
+            </div>
+            <div class="col-12 col-lg-8">
+                <div class="card-dashboard">
+                    <div class="card-title mb-3">Mis categorías</div>
+                    <div class="table-responsive">
+                            <table class="table table-dashboard">
+                                <thead>
+                                    <tr>
+                                        <th>Icono</th>
+                                        <th>Nombre</th>
+                                        <th>Tipo</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="cat : ${categorias}">
+                                        <td style="font-size: 22px;" th:text="${cat.icono != null} ? ${cat.icono} : '📁'"></td>
+                                        <td th:text="${cat.nombre}"></td>
+                                        <td>
+                                            <span th:if="${cat.tipo.name() == 'INGRESO'}" class="badge-income">Ingreso</span>
+                                            <span th:if="${cat.tipo.name() == 'GASTO'}" class="badge-expense">Gasto</span>
+                                        </td>
+                                    <td>
+                                        <a th:href="@{/categorias/editar/{id}(id=${cat.id})}" class="btn btn-sm" style="color: #6E71C4;">Editar</a>
+                                        <a th:href="@{/categorias/eliminar/{id}(id=${cat.id})}" class="btn btn-sm" style="color: #E53935;" onclick="return confirm('¿Eliminar esta categoría?')">Eliminar</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div th:replace="~{fragments/scripts :: scripts}"></div>
+</body>
+</html>

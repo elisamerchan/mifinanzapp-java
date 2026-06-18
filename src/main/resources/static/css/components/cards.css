@@ -1,0 +1,55 @@
+/* === CARDS === */
+.card-dashboard {
+    background: var(--card-bg);
+    border: none;
+    border-radius: var(--radius);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+    padding: 20px;
+    transition: box-shadow 0.2s;
+}
+
+.card-dashboard:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.card-dashboard .card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+.card-dashboard .card-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.card-dashboard .card-value.income {
+    color: var(--income);
+}
+
+.card-dashboard .card-value.expense {
+    color: var(--expense);
+}
+
+/* Quick action cards with colored border */
+.card-dashboard[style*="border-left"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* === EMPTY STATE === */
+.empty-state {
+    text-align: center;
+    padding: 48px 20px;
+    color: var(--text-secondary);
+}
+
+.empty-state .empty-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}

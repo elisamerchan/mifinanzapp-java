@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <nav th:fragment="sidebar" class="sidebar">
+        <div class="sidebar-logo">
+            <div class="sidebar-logo-icon">M</div>
+            <span class="sidebar-logo-text">Mi FinanzApp</span>
+        </div>
+        <div class="sidebar-menu">
+            <a th:href="@{/dashboard}" th:classappend="${#strings.contains(currentUri, 'dashboard')} ? 'active' : ''">Inicio</a>
+            <a th:href="@{/movimientos/nuevo}" th:classappend="${#strings.contains(currentUri, 'movimientos/nuevo')} ? 'active' : ''">Registrar movimiento</a>
+            <a th:href="@{/historial}" th:classappend="${#strings.contains(currentUri, 'historial')} ? 'active' : ''">Historial</a>
+            <a th:href="@{/categorias}" th:classappend="${#strings.contains(currentUri, 'categorias')} ? 'active' : ''">Categorías</a>
+            <a th:href="@{/reportes}" th:classappend="${#strings.contains(currentUri, 'reportes')} ? 'active' : ''">Reportes y análisis</a>
+            <a th:href="@{/presupuestos}" th:classappend="${#strings.contains(currentUri, 'presupuestos')} ? 'active' : ''">Presupuesto mensual</a>
+            <a th:href="@{/recordatorios}" th:classappend="${#strings.contains(currentUri, 'recordatorios')} ? 'active' : ''">Recordatorios</a>
+            <a th:href="@{/educacion}" th:classappend="${#strings.contains(currentUri, 'educacion')} ? 'active' : ''">Contenido educativo</a>
+            <a th:href="@{/configuracion}" th:classappend="${#strings.contains(currentUri, 'configuracion')} ? 'active' : ''">Configuración</a>
+        </div>
+        <div class="sidebar-menu" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 8px;">
+            <a th:href="@{/auth/logout}">Cerrar sesión</a>
+        </div>
+    </nav>
+</body>
+</html>

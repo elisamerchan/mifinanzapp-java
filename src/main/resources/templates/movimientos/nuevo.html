@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:replace="~{fragments/head :: head('Registrar movimiento')}"></head>
+<body>
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    <div class="main-content">
+        <div th:replace="~{fragments/header :: header('Registrar movimiento')}"></div>
+
+        <div class="card-dashboard">
+            <ul class="nav nav-tabs mb-4" style="border-bottom: 2px solid #F0F0F0;" id="movimientoTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="ingreso-tab" data-bs-toggle="tab" data-bs-target="#ingreso" type="button" role="tab" style="color: #4CAF50; font-weight: 600; border: none; border-bottom: 2px solid transparent; padding: 10px 20px;" aria-selected="true">💰 Ingreso</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="gasto-tab" data-bs-toggle="tab" data-bs-target="#gasto" type="button" role="tab" style="color: #E53935; font-weight: 600; border: none; border-bottom: 2px solid transparent; padding: 10px 20px;" aria-selected="false">💳 Gasto</button>
+                </li>
+            </ul>
+            <div class="tab-content" id="movimientoTabContent">
+                <div class="tab-pane fade show active" id="ingreso" role="tabpanel">
+                    <form th:action="@{/movimientos/guardar-ingreso}" th:object="${ingreso}" method="post">
+                        <div class="row g-3">
+                            <div class="col-12 col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label" style="font-size: 14px; font-weight: 500;">Monto</label>
+                                    <input type="number" step="0.01" th:field="*{monto}" class="form-control form-custom" required placeholder="0.00">
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label" style="font-size: 14px; font-weight: 500;">Categoría</label>
+                                    <select th:field="*{categoria.id}" class="form-select form-custom" required>
+                                        <option value="">Seleccionar...</option>
+                                        <option th:each="cat : ${categoriasIngreso}" th:value="${cat.id}" th:text="${cat.icono != null} ? ${cat.icono + ' ' + cat.nombre} : ${cat.nombre}"></option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label" style="font-size: 14px; font-weight: 500;">Fecha</label>
+                                    <input type="date" th:field="*{fecha}" class="form-control form-custom" required>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label" style="font-size: 14px; font-weight: 500;">Descripción</label>
+                                    <input type="text" th:field="*{descripcion}" class="form-control form-custom" placeholder="Opcional">
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn w-100 py-2" style="background: #4CAF50; color: white; border: none; border-radius: 10px; font-weight: 600;">Registrar ingreso</button>
+                    </form>
+                </div>
+                <div class="tab-pane fade" id="gasto" role="tabpanel">
+                    <form th:action="@{/movimientos/guardar-gasto}" th:object="${gasto}" method="post">
+                        <div class="row g-3">
+                            <div class="col-12 col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label" style="font-size: 14px; font-weight: 500;">Monto</label>
+                                    <input type="number" step="0.01" th:field="*{monto}" class="form-control form-custom" required placeholder="0.00">
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label" style="font-size: 14px; font-weight: 500;">Categoría</label>
+                                    <select th:field="*{categoria.id}" class="form-select form-custom" required>
+                                        <option value="">Seleccionar...</option>
+                                        <option th:each="cat : ${categoriasGasto}" th:value="${cat.id}" th:text="${cat.icono != null} ? ${cat.icono + ' ' + cat.nombre} : ${cat.nombre}"></option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label" style="font-size: 14px; font-weight: 500;">Método de pago</label>
+                                    <select th:field="*{metodoPago}" class="form-select form-custom" required>
+                                        <option value="">Seleccionar...</option>
+                                        <option th:each="m : ${metodosPago}" th:value="${m}" th:text="${m}"></option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label" style="font-size: 14px; font-weight: 500;">Fecha</label>
+                                    <input type="date" th:field="*{fecha}" class="form-control form-custom" required>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label class="form-label" style="font-size: 14px; font-weight: 500;">Descripción</label>
+                                    <input type="text" th:field="*{descripcion}" class="form-control form-custom" placeholder="Opcional">
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn w-100 py-2" style="background: #E53935; color: white; border: none; border-radius: 10px; font-weight: 600;">Registrar gasto</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div th:replace="~{fragments/scripts :: scripts}"></div>
+</body>
+</html>

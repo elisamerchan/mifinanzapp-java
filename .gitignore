@@ -1,0 +1,27 @@
+# Maven
+target/
+*.jar
+*.war
+
+# Node / pnpm
+node_modules/
+pnpm-lock.yaml
+
+# Environment
+.env
+.env.local
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

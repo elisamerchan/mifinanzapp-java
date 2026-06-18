@@ -1,0 +1,30 @@
+/* === PROGRESS BAR === */
+.progress-custom {
+    height: 8px;
+    border-radius: 4px;
+    background: #E8E8E8;
+}
+
+.progress-custom .progress-bar {
+    border-radius: 4px;
+    background: var(--primary);
+}
+
+/* === BADGES === */
+.badge-income {
+    background: rgba(76, 175, 80, 0.12);
+    color: var(--income);
+    font-weight: 600;
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 20px;
+}
+
+.badge-expense {
+    background: rgba(229, 57, 53, 0.12);
+    color: var(--expense);
+    font-weight: 600;
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 20px;
+}
