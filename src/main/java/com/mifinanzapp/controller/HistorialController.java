@@ -64,6 +64,7 @@ public class HistorialController {
             m.put("descripcion", g.getDescripcion());
             m.put("monto", g.getMonto());
             m.put("montoStr", "-$" + df.format(g.getMonto()));
+            m.put("id", g.getId());
             movimientos.add(m);
         }
 
@@ -77,6 +78,7 @@ public class HistorialController {
             m.put("descripcion", i.getDescripcion());
             m.put("monto", i.getMonto());
             m.put("montoStr", "+$" + df.format(i.getMonto()));
+            m.put("id", i.getId());
             movimientos.add(m);
         }
 

@@ -4,6 +4,8 @@ import com.mifinanzapp.entity.Categoria;
 import com.mifinanzapp.entity.Gasto;
 import com.mifinanzapp.entity.Ingreso;
 import com.mifinanzapp.entity.Usuario;
+import com.mifinanzapp.repository.GastoRepository;
+import com.mifinanzapp.repository.IngresoRepository;
 import com.mifinanzapp.service.CategoriaService;
 import com.mifinanzapp.service.GastoService;
 import com.mifinanzapp.service.IngresoService;
@@ -12,6 +14,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.math.BigDecimal;
 
 /**
  * Controlador para el registro rápido de movimientos.
@@ -29,18 +33,26 @@ public class MovimientoController {
     private final UsuarioService usuarioService;
     private final IngresoService ingresoService;
     private final GastoService gastoService;
+    private final IngresoRepository ingresoRepository;
+    private final GastoRepository gastoRepository;
 
     public MovimientoController(CategoriaService categoriaService, UsuarioService usuarioService,
-                                 IngresoService ingresoService, GastoService gastoService) {
+                                 IngresoService ingresoService, GastoService gastoService,
+                                 IngresoRepository ingresoRepository, GastoRepository gastoRepository) {
         this.categoriaService = categoriaService;
         this.usuarioService = usuarioService;
         this.ingresoService = ingresoService;
         this.gastoService = gastoService;
+        this.ingresoRepository = ingresoRepository;
+        this.gastoRepository = gastoRepository;
     }
 
     @GetMapping("/nuevo")
     public String nuevo(Model model, Authentication auth) {
         Usuario usuario = usuarioService.buscarPorEmail(auth.getName());
+        BigDecimal balance = ingresoRepository.sumByUsuarioId(usuario.getId())
+                .subtract(gastoRepository.sumByUsuarioId(usuario.getId()));
+        model.addAttribute("balance", balance);
         model.addAttribute("ingreso", new Ingreso());
         model.addAttribute("gasto", new Gasto());
         model.addAttribute("categoriasIngreso", categoriaService.listarPorTipo(usuario.getId(), Categoria.TipoCategoria.INGRESO));

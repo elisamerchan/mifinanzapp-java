@@ -56,9 +56,8 @@
                             <div class="mt-2">
                                 <div class="progress-custom">
                                     <div class="progress-bar" role="progressbar"
-                                         th:style="${'width: ' + (p.porcentaje > 100 ? 100 : p.porcentaje) + '%'}"
-                                         th:classappend="${p.porcentaje > 90} ? 'bg-danger' : (${p.porcentaje > 70} ? 'bg-warning' : '')"
-                                         th:styleappend="${p.porcentaje <= 70} ? 'background: #6E71C4;' : (${p.porcentaje > 90} ? 'background: #E53935;' : 'background: #FF9800;')"></div>
+                                         th:classappend="${p.porcentaje > 90 ? 'bg-danger' : (p.porcentaje > 70 ? 'bg-warning' : '')}"
+                                         th:style="${'width: ' + (p.porcentaje > 100 ? 100 : p.porcentaje) + '%; background: ' + (p.porcentaje <= 70 ? '#6E71C4' : (p.porcentaje > 90 ? '#E53935' : '#FF9800')) + ';'}"></div>
                                 </div>
                                 <div style="font-size: 11px; color: #7A7A7A; margin-top: 2px;" th:text="${p.porcentaje + '% utilizado'}"></div>
                             </div>

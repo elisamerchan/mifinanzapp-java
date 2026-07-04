@@ -73,5 +73,18 @@
         </div>
     </div>
     <div th:replace="~{fragments/scripts :: scripts}"></div>
+    <script th:inline="javascript">
+        const balance = [[${balance}]];
+        document.querySelector('form[action*="/gastos/guardar"]').addEventListener('submit', function(e) {
+            const montoInput = this.querySelector('input[name="monto"]');
+            if (!montoInput) return;
+            const monto = parseFloat(montoInput.value);
+            if (monto > balance) {
+                if (!confirm('Este gasto de $' + monto.toFixed(2) + ' supera tu saldo disponible de $' + balance.toFixed(2) + '. Tu balance quedará en negativo. \u00BFDeseas continuar?')) {
+                    e.preventDefault();
+                }
+            }
+        });
+    </script>
 </body>
 </html>

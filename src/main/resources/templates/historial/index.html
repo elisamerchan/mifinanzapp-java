@@ -41,6 +41,7 @@
                                     <th>Categoría</th>
                                     <th>Descripción</th>
                                     <th>Monto</th>
+                                    <th>Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -53,9 +54,15 @@
                                     <td th:text="${m.categoria}"></td>
                                     <td th:text="${m.descripcion}"></td>
                                     <td th:text="${m.montoStr}" th:style="${m.tipo == 'INGRESO'} ? 'color:#4CAF50;font-weight:600;' : 'color:#E53935;font-weight:600;'"></td>
+                                    <td>
+                                        <a th:if="${m.tipo == 'INGRESO'}" th:href="@{/ingresos/editar/{id}(id=${m.id})}" style="color: #6E71C4; font-size: 13px;">Editar</a>
+                                        <a th:if="${m.tipo == 'GASTO'}" th:href="@{/gastos/editar/{id}(id=${m.id})}" style="color: #6E71C4; font-size: 13px;">Editar</a>
+                                        <a th:if="${m.tipo == 'INGRESO'}" th:href="@{/ingresos/eliminar/{id}(id=${m.id})}" style="color: #E53935; font-size: 13px; margin-left: 8px;" onclick="return confirm('¿Eliminar?')">Eliminar</a>
+                                        <a th:if="${m.tipo == 'GASTO'}" th:href="@{/gastos/eliminar/{id}(id=${m.id})}" style="color: #E53935; font-size: 13px; margin-left: 8px;" onclick="return confirm('¿Eliminar?')">Eliminar</a>
+                                    </td>
                                 </tr>
                                 <tr th:if="${#lists.isEmpty(movimientos)}">
-                                    <td colspan="5" class="text-center" style="color: #7A7A7A; padding: 32px;">No hay movimientos en este período</td>
+                                    <td colspan="6" class="text-center" style="color: #7A7A7A; padding: 32px;">No hay movimientos en este período</td>
                                 </tr>
                             </tbody>
                         </table>
