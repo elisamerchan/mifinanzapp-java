@@ -17,6 +17,7 @@ Aplicación web para la gestión de finanzas personales. Permite registrar ingre
 
 - Java 17 o superior
 - Maven 3.8+ (incluye wrapper `mvnw.cmd`)
+- Variable de entorno `JAVA_HOME` apuntando a tu JDK 17 (ej: `C:\Program Files\Java\jdk-17`)
 - Node.js 18+ y pnpm (solo para assets frontend)
 
 ## Configuración Inicial
@@ -48,6 +49,15 @@ pnpm install
 ```
 
 ### 3. Compilar y ejecutar
+
+> **⚠️ Importante**: El wrapper `mvnw.cmd` requiere la variable `JAVA_HOME`. Si no la tienes configurada, defínela antes de ejecutar:
+> ```powershell
+> $env:JAVA_HOME = "C:\Program Files\Java\jdk-17"
+> ```
+> O directamente en una línea:
+> ```powershell
+> $env:JAVA_HOME = "C:\Program Files\Java\jdk-17"; ./mvnw.cmd spring-boot:run
+> ```
 
 ```bash
 # Compilar el proyecto (descarga dependencias, ejecuta tests)
