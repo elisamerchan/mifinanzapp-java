@@ -1,6 +1,7 @@
 package com.mifinanzapp.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -30,12 +31,16 @@ public class Ingreso {
     @JoinColumn(name = "categoria_id", nullable = false)
     private Categoria categoria;
 
+    @NotNull(message = "El monto es obligatorio")
+    @Positive(message = "El monto debe ser mayor que cero")
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal monto;
 
+    @NotNull(message = "La fecha es obligatoria")
     @Column(nullable = false)
     private LocalDate fecha;
 
+    @Size(max = 255, message = "La descripción admite máximo 255 caracteres")
     @Column(length = 255)
     private String descripcion;
 
