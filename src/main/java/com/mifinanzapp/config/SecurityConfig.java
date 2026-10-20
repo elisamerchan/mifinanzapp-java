@@ -8,7 +8,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 /**
  * Configuración de seguridad Spring Security.
@@ -32,9 +31,8 @@ public class SecurityConfig {
      * Configura la cadena de filtros de seguridad.
      * <p>
      * Los recursos estáticos y las rutas de autenticación son públicas.
-     * El resto de rutas requieren autenticación. CSRF está deshabilitado
-     * porque la aplicación usa formularios Thymeleaf con POST desde el
-     * mismo origen y actualmente no hay endpoints REST externos.
+     * El resto de rutas requieren autenticación. CSRF está habilitado:
+     * los formularios Thymeleaf con {@code th:action} incluyen el token automáticamente.
      *
      * @param http el builder de seguridad HTTP
      * @return la cadena de filtros configurada
@@ -45,7 +43,6 @@ public class SecurityConfig {
         http
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/", "/css/**", "/js/**", "/vendor/**", "/img/**").permitAll()
-                .requestMatchers("/auth/registro", "/auth/login", "/auth/olvide-password").permitAll()
                 .requestMatchers("/auth/**").permitAll()
                 .anyRequest().authenticated()
             )
@@ -57,14 +54,13 @@ public class SecurityConfig {
                 .permitAll()
             )
             .logout(logout -> logout
-                .logoutRequestMatcher(new AntPathRequestMatcher("/auth/logout"))
+                .logoutUrl("/auth/logout") // solo POST con token CSRF
                 .logoutSuccessUrl("/auth/login?logout=true")
                 .invalidateHttpSession(true)
                 .clearAuthentication(true)
                 .permitAll()
             )
-            .userDetailsService(userDetailsService)
-            .csrf(csrf -> csrf.disable());
+            .userDetailsService(userDetailsService);
 
         return http.build();
     }

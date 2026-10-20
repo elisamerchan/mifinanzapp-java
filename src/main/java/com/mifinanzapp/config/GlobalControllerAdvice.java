@@ -1,10 +1,14 @@
 package com.mifinanzapp.config;
 
+import com.mifinanzapp.entity.Usuario;
 import com.mifinanzapp.service.UsuarioService;
+import com.mifinanzapp.util.MonetaryUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
@@ -13,7 +17,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
  * <p>
  * Provee atributos comunes a todas las vistas Thymeleaf,
  * como la URI actual para resaltar la navegación activa en el sidebar,
- * y los datos del usuario autenticado (nombre, email).
+ * y los datos del usuario autenticado (nombre, email, símbolo de moneda).
  *
  * @since 1.0.0
  */
@@ -43,31 +47,23 @@ public class GlobalControllerAdvice {
     }
 
     /**
-     * Expone el nombre del usuario autenticado como atributo del modelo.
+     * Expone {@code nombre}, {@code email} y {@code simbolo} (moneda preferida) del usuario
+     * autenticado, con una sola consulta por petición.
      *
-     * @param auth la autenticación actual
-     * @return el nombre del usuario, o {@code null} si no hay sesión
+     * @param model el modelo de la vista
+     * @param auth  la autenticación actual, {@code null} si no hay sesión
      */
-    @ModelAttribute("nombre")
-    public String globalNombre(Authentication auth) {
-        if (auth == null || auth.getName() == null) return null;
+    @ModelAttribute
+    public void usuarioActual(Model model, Authentication auth) {
+        model.addAttribute("simbolo", "$");
+        if (auth == null || auth instanceof AnonymousAuthenticationToken) return;
+        model.addAttribute("email", auth.getName());
         try {
-            return usuarioService.buscarPorEmail(auth.getName()).getNombre();
+            Usuario usuario = usuarioService.buscarPorEmail(auth.getName());
+            model.addAttribute("nombre", usuario.getNombre());
+            model.addAttribute("simbolo", MonetaryUtils.simbolo(usuario.getMoneda()));
         } catch (Exception e) {
-            log.warn("No se pudo obtener nombre para {}", auth.getName());
-            return null;
+            log.warn("No se pudo obtener el usuario {}", auth.getName());
         }
-    }
-
-    /**
-     * Expone el email del usuario autenticado como atributo del modelo.
-     *
-     * @param auth la autenticación actual
-     * @return el email del usuario, o {@code null} si no hay sesión
-     */
-    @ModelAttribute("email")
-    public String globalEmail(Authentication auth) {
-        if (auth == null) return null;
-        return auth.getName();
     }
 }
