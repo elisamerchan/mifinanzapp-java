@@ -2,6 +2,7 @@ package com.mifinanzapp.controller;
 
 import com.mifinanzapp.entity.Usuario;
 import com.mifinanzapp.service.DashboardService;
+import com.mifinanzapp.service.RecordatorioService;
 import com.mifinanzapp.service.UsuarioService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,10 +33,13 @@ public class DashboardController {
 
     private final DashboardService dashboardService;
     private final UsuarioService usuarioService;
+    private final RecordatorioService recordatorioService;
 
-    public DashboardController(DashboardService dashboardService, UsuarioService usuarioService) {
+    public DashboardController(DashboardService dashboardService, UsuarioService usuarioService,
+                               RecordatorioService recordatorioService) {
         this.dashboardService = dashboardService;
         this.usuarioService = usuarioService;
+        this.recordatorioService = recordatorioService;
     }
 
     @GetMapping("/dashboard")
@@ -56,6 +60,7 @@ public class DashboardController {
         model.addAttribute("movimientosRecientes", dashboardService.getMovimientosRecientes(uid, 5));
         model.addAttribute("presupuestos", dashboardService.getPresupuestosConProgreso(uid));
         model.addAttribute("consejo", dashboardService.getConsejoAleatorio());
+        model.addAttribute("recordatoriosPendientes", recordatorioService.pendientesHasta(uid, 7));
 
         model.addAttribute("totalMovimientos", dashboardService.getTotalMovimientosDelMes(uid));
         model.addAttribute("porcentajeAhorro", dashboardService.getPorcentajeAhorro(uid));

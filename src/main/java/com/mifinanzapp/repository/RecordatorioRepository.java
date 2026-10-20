@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Repositorio JPA para la entidad {@link Recordatorio}.
@@ -17,4 +18,5 @@ import java.util.List;
 @Repository
 public interface RecordatorioRepository extends JpaRepository<Recordatorio, Long> {
     List<Recordatorio> findByUsuarioIdOrderByFechaAsc(Long usuarioId);
+    Optional<Recordatorio> findByIdAndUsuarioId(Long id, Long usuarioId);
 }

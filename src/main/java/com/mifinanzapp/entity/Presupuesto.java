@@ -1,6 +1,7 @@
 package com.mifinanzapp.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
 
 /**
@@ -30,12 +31,18 @@ public class Presupuesto {
     @JoinColumn(name = "categoria_id", nullable = false)
     private Categoria categoria;
 
+    @NotNull(message = "El mes es obligatorio")
+    @Min(1) @Max(12)
     @Column(nullable = false, length = 2)
     private Integer mes;
 
+    @NotNull(message = "El año es obligatorio")
+    @Min(value = 2000, message = "Año no válido") @Max(value = 2100, message = "Año no válido")
     @Column(nullable = false, length = 4)
     private Integer anio;
 
+    @NotNull(message = "El monto límite es obligatorio")
+    @Positive(message = "El monto límite debe ser mayor que cero")
     @Column(name = "monto_limite", nullable = false, precision = 12, scale = 2)
     private BigDecimal montoLimite;
 

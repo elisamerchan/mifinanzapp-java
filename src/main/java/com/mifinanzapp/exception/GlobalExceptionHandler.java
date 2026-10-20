@@ -2,17 +2,24 @@ package com.mifinanzapp.exception;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.servlet.support.RequestContextUtils;
+
+import java.net.URI;
 
 /**
  * Manejador global de excepciones para controladores MVC.
  * <p>
  * Captura las excepciones lanzadas por los controladores y servicios,
- * registra el error y retorna una vista de error apropiada.
+ * registra el error y retorna una vista de error apropiada. Los errores de negocio
+ * (400 y 409) de un envío de formulario POST vuelven a la página de origen con un
+ * mensaje flash {@code error} en lugar de mostrar una página de error.
  *
  * @since 1.0.0
  */
@@ -45,9 +52,12 @@ public class GlobalExceptionHandler {
      * @return nombre de la plantilla de error
      */
     @ExceptionHandler(DuplicateResourceException.class)
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public String handleDuplicateResource(DuplicateResourceException ex, Model model) {
+    public String handleDuplicateResource(DuplicateResourceException ex, Model model,
+                                          HttpServletRequest request, HttpServletResponse response) {
         log.warn("duplicate_resource message={}", ex.getMessage());
+        String volver = volverConError(request, ex.getMessage());
+        if (volver != null) return volver;
+        response.setStatus(HttpStatus.CONFLICT.value());
         model.addAttribute("error", ex.getMessage());
         model.addAttribute("status", 409);
         return "error/409";
@@ -61,9 +71,12 @@ public class GlobalExceptionHandler {
      * @return nombre de la plantilla de error
      */
     @ExceptionHandler(IllegalArgumentException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String handleBadRequest(IllegalArgumentException ex, Model model) {
+    public String handleBadRequest(IllegalArgumentException ex, Model model,
+                                   HttpServletRequest request, HttpServletResponse response) {
         log.warn("bad_request message={}", ex.getMessage());
+        String volver = volverConError(request, ex.getMessage());
+        if (volver != null) return volver;
+        response.setStatus(HttpStatus.BAD_REQUEST.value());
         model.addAttribute("error", ex.getMessage());
         model.addAttribute("status", 400);
         return "error/400";
@@ -83,5 +96,24 @@ public class GlobalExceptionHandler {
         model.addAttribute("error", "Ha ocurrido un error inesperado. Intenta nuevamente.");
         model.addAttribute("status", 500);
         return "error/500";
+    }
+
+    /**
+     * Si la petición es un POST con Referer, prepara un redirect a la misma ruta (solo el path,
+     * para no permitir redirecciones a otros dominios) con el mensaje como flash {@code error}.
+     *
+     * @return la vista {@code redirect:...}, o {@code null} si no aplica
+     */
+    private String volverConError(HttpServletRequest request, String mensaje) {
+        String referer = request.getHeader("Referer");
+        if (!"POST".equals(request.getMethod()) || referer == null) return null;
+        try {
+            String path = URI.create(referer).getPath();
+            if (path == null || !path.startsWith("/") || path.startsWith("//")) return null;
+            RequestContextUtils.getOutputFlashMap(request).put("error", mensaje);
+            return "redirect:" + path;
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 }

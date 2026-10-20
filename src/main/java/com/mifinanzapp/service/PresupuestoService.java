@@ -1,7 +1,10 @@
 package com.mifinanzapp.service;
 
+import com.mifinanzapp.entity.Categoria;
 import com.mifinanzapp.entity.Presupuesto;
+import com.mifinanzapp.exception.DuplicateResourceException;
 import com.mifinanzapp.exception.ResourceNotFoundException;
+import com.mifinanzapp.repository.CategoriaRepository;
 import com.mifinanzapp.repository.GastoRepository;
 import com.mifinanzapp.repository.PresupuestoRepository;
 import org.slf4j.Logger;
@@ -30,10 +33,13 @@ public class PresupuestoService {
 
     private final PresupuestoRepository presupuestoRepository;
     private final GastoRepository gastoRepository;
+    private final CategoriaRepository categoriaRepository;
 
-    public PresupuestoService(PresupuestoRepository presupuestoRepository, GastoRepository gastoRepository) {
+    public PresupuestoService(PresupuestoRepository presupuestoRepository, GastoRepository gastoRepository,
+                              CategoriaRepository categoriaRepository) {
         this.presupuestoRepository = presupuestoRepository;
         this.gastoRepository = gastoRepository;
+        this.categoriaRepository = categoriaRepository;
     }
 
     public List<Map<String, Object>> listarConProgreso(Long usuarioId) {
@@ -68,21 +74,40 @@ public class PresupuestoService {
     @Transactional
     @CacheEvict(value = "dashboard", allEntries = true)
     public Presupuesto guardar(Presupuesto presupuesto) {
+        Long usuarioId = presupuesto.getUsuario().getId();
+        if (presupuesto.getCategoria() == null || presupuesto.getCategoria().getId() == null) {
+            throw new IllegalArgumentException("La categoría es obligatoria");
+        }
+        Categoria categoria = categoriaRepository.findByIdAndUsuarioId(presupuesto.getCategoria().getId(), usuarioId)
+                .orElseThrow(() -> new ResourceNotFoundException("Categoría", "id", presupuesto.getCategoria().getId()));
+        if (categoria.getTipo() != Categoria.TipoCategoria.GASTO) {
+            throw new IllegalArgumentException("La categoría del presupuesto debe ser de tipo GASTO");
+        }
+        if (presupuesto.getId() != null) {
+            buscarPorId(presupuesto.getId(), usuarioId); // impide sobrescribir presupuestos ajenos
+        }
+        presupuestoRepository.findByUsuarioIdAndCategoriaIdAndMesAndAnio(
+                        usuarioId, categoria.getId(), presupuesto.getMes(), presupuesto.getAnio())
+                .filter(existente -> !existente.getId().equals(presupuesto.getId()))
+                .ifPresent(existente -> {
+                    throw new DuplicateResourceException("Ya existe un presupuesto para " + categoria.getNombre()
+                            + " en " + presupuesto.getMes() + "/" + presupuesto.getAnio());
+                });
         log.info("guardar_presupuesto usuarioId={} categoriaId={} mes={} anio={} limite={}",
                 presupuesto.getUsuario().getId(), presupuesto.getCategoria().getId(),
                 presupuesto.getMes(), presupuesto.getAnio(), presupuesto.getMontoLimite());
         return presupuestoRepository.save(presupuesto);
     }
 
-    public Presupuesto buscarPorId(Long id) {
-        return presupuestoRepository.findById(id)
+    public Presupuesto buscarPorId(Long id, Long usuarioId) {
+        return presupuestoRepository.findByIdAndUsuarioId(id, usuarioId)
                 .orElseThrow(() -> new ResourceNotFoundException("Presupuesto", "id", id));
     }
 
     @Transactional
     @CacheEvict(value = "dashboard", allEntries = true)
-    public void eliminar(Long id) {
-        log.info("eliminar_presupuesto id={}", id);
-        presupuestoRepository.deleteById(id);
+    public void eliminar(Long id, Long usuarioId) {
+        log.info("eliminar_presupuesto id={} usuarioId={}", id, usuarioId);
+        presupuestoRepository.delete(buscarPorId(id, usuarioId));
     }
 }

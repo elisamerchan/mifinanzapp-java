@@ -3,6 +3,7 @@ package com.mifinanzapp.repository;
 import com.mifinanzapp.entity.Categoria;
 import com.mifinanzapp.entity.Gasto;
 import com.mifinanzapp.entity.Usuario;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Repositorio JPA para la entidad {@link Gasto}.
@@ -27,12 +29,19 @@ import java.util.List;
 public interface GastoRepository extends JpaRepository<Gasto, Long> {
     List<Gasto> findByUsuarioOrderByFechaDesc(Usuario usuario);
     List<Gasto> findByUsuarioIdOrderByFechaDesc(Long usuarioId);
+    Optional<Gasto> findByIdAndUsuarioId(Long id, Long usuarioId);
 
     @EntityGraph(attributePaths = "categoria")
     List<Gasto> findByUsuarioOrderByFechaDesc(Usuario usuario, Pageable pageable);
 
     @EntityGraph(attributePaths = "categoria")
     List<Gasto> findByUsuarioIdOrderByFechaDesc(Long usuarioId, Pageable pageable);
+
+    @EntityGraph(attributePaths = "categoria")
+    Page<Gasto> findByUsuarioId(Long usuarioId, Pageable pageable);
+
+    @EntityGraph(attributePaths = "categoria")
+    List<Gasto> findByUsuarioIdAndFechaBetweenOrderByFechaDescIdDesc(Long usuarioId, LocalDate inicio, LocalDate fin);
 
     @Query("SELECT COUNT(g) FROM Gasto g WHERE g.usuario.id = :usuarioId AND g.fecha BETWEEN :inicio AND :fin")
     long countByUsuarioAndFechaBetween(@Param("usuarioId") Long usuarioId, @Param("inicio") LocalDate inicio, @Param("fin") LocalDate fin);

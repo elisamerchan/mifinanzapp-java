@@ -8,6 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /**
  * Controlador para la gestión de categorías de ingresos y gastos.
@@ -45,10 +46,11 @@ public class CategoriaController {
     }
 
     @PostMapping("/guardar")
-    public String guardar(@ModelAttribute Categoria categoria, Authentication auth) {
+    public String guardar(@ModelAttribute Categoria categoria, Authentication auth, RedirectAttributes flash) {
         Usuario usuario = usuarioService.buscarPorEmail(auth.getName());
         categoria.setUsuario(usuario);
         categoriaService.guardar(categoria);
+        flash.addFlashAttribute("mensaje", "Categoría guardada");
         return "redirect:/categorias";
     }
 
@@ -56,13 +58,16 @@ public class CategoriaController {
     public String editar(@PathVariable Long id, Model model, Authentication auth) {
         Usuario usuario = usuarioService.buscarPorEmail(auth.getName());
         model.addAttribute("categorias", categoriaService.listarTodas(usuario.getId()));
-        model.addAttribute("categoria", categoriaService.buscarPorId(id));
+        model.addAttribute("categoria", categoriaService.buscarPorId(id, usuario.getId()));
+        model.addAttribute("iconos", ICONOS);
         return "categorias/index";
     }
 
-    @GetMapping("/eliminar/{id}")
-    public String eliminar(@PathVariable Long id) {
-        categoriaService.eliminar(id);
+    @PostMapping("/eliminar/{id}")
+    public String eliminar(@PathVariable Long id, Authentication auth, RedirectAttributes flash) {
+        Usuario usuario = usuarioService.buscarPorEmail(auth.getName());
+        categoriaService.eliminar(id, usuario.getId());
+        flash.addFlashAttribute("mensaje", "Categoría eliminada");
         return "redirect:/categorias";
     }
 }

@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Repositorio JPA para la entidad {@link Categoria}.
@@ -21,6 +22,7 @@ import java.util.List;
 public interface CategoriaRepository extends JpaRepository<Categoria, Long> {
     List<Categoria> findByUsuarioOrUsuarioIsNull(Usuario usuario);
     List<Categoria> findByUsuarioId(Long usuarioId);
+    Optional<Categoria> findByIdAndUsuarioId(Long id, Long usuarioId);
 
     @Query("SELECT c FROM Categoria c WHERE c.usuario.id = :usuarioId AND (:tipo IS NULL OR c.tipo = :tipo)")
     List<Categoria> findByUsuarioIdAndTipo(@Param("usuarioId") Long usuarioId, @Param("tipo") Categoria.TipoCategoria tipo);

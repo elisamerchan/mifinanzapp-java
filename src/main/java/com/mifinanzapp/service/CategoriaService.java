@@ -5,6 +5,7 @@ import com.mifinanzapp.exception.ResourceNotFoundException;
 import com.mifinanzapp.repository.CategoriaRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,20 +40,28 @@ public class CategoriaService {
 
     @Transactional
     public Categoria guardar(Categoria categoria) {
+        if (categoria.getId() != null) {
+            buscarPorId(categoria.getId(), categoria.getUsuario().getId()); // impide sobrescribir categorías ajenas
+        }
         log.info("guardar_categoria usuarioId={} nombre={} tipo={}",
                 categoria.getUsuario().getId(), categoria.getNombre(), categoria.getTipo());
         return categoriaRepository.save(categoria);
     }
 
-    public Categoria buscarPorId(Long id) {
-        return categoriaRepository.findById(id)
+    public Categoria buscarPorId(Long id, Long usuarioId) {
+        return categoriaRepository.findByIdAndUsuarioId(id, usuarioId)
                 .orElseThrow(() -> new ResourceNotFoundException("Categoría", "id", id));
     }
 
     @Transactional
-    public void eliminar(Long id) {
-        log.info("eliminar_categoria id={}", id);
-        categoriaRepository.deleteById(id);
+    public void eliminar(Long id, Long usuarioId) {
+        log.info("eliminar_categoria id={} usuarioId={}", id, usuarioId);
+        categoriaRepository.delete(buscarPorId(id, usuarioId));
+        try {
+            categoriaRepository.flush();
+        } catch (DataIntegrityViolationException e) {
+            throw new IllegalArgumentException("No se puede eliminar: la categoría tiene ingresos, gastos o presupuestos asociados");
+        }
     }
 
     public List<Categoria> listarTodas(Long usuarioId) {

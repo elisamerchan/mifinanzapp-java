@@ -32,6 +32,18 @@ public final class MonetaryUtils {
     }
 
     /**
+     * Devuelve el símbolo a mostrar para un código de moneda de las preferencias del usuario.
+     *
+     * @param codigo código ISO (USD, EUR, COP, MXN, ARS, PEN)
+     * @return símbolo, {@code "$"} por defecto
+     */
+    public static String simbolo(String codigo) {
+        if ("EUR".equals(codigo)) return "€";
+        if ("PEN".equals(codigo)) return "S/";
+        return "$";
+    }
+
+    /**
      * Calcula el porcentaje que representa una parte respecto a un total.
      *
      * @param parte  valor parcial

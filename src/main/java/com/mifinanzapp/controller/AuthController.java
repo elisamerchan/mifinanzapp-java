@@ -3,6 +3,7 @@ package com.mifinanzapp.controller;
 import com.mifinanzapp.dto.UsuarioRegistroDTO;
 import com.mifinanzapp.service.UsuarioService;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -25,12 +26,16 @@ public class AuthController {
 
     private final UsuarioService usuarioService;
 
-    public AuthController(UsuarioService usuarioService) {
+    private final boolean demoHabilitado;
+
+    public AuthController(UsuarioService usuarioService, @Value("${app.demo.habilitado:false}") boolean demoHabilitado) {
         this.usuarioService = usuarioService;
+        this.demoHabilitado = demoHabilitado;
     }
 
     @GetMapping("/login")
-    public String login() {
+    public String login(Model model) {
+        model.addAttribute("demoHabilitado", demoHabilitado);
         return "auth/login";
     }
 
