@@ -8,27 +8,40 @@
     <div class="main-content">
         <div th:replace="~{fragments/header :: header('Dashboard')}"></div>
 
+        <!-- === ALERTAS === -->
+        <div th:each="p : ${presupuestos}" th:if="${p.porcentaje >= 80}" class="alert d-flex align-items-center gap-2" th:classappend="${p.excedido} ? 'alert-danger' : 'alert-warning'" role="alert">
+            <span aria-hidden="true" th:text="${p.excedido} ? '🚨' : '⚠️'"></span>
+            <span th:text="${p.excedido} ? ('Superaste el presupuesto de ' + p.categoria + ' (' + p.porcentaje + '%).') : ('Llevas el ' + p.porcentaje + '% del presupuesto de ' + p.categoria + '.')"></span>
+        </div>
+        <div th:if="${not #lists.isEmpty(recordatoriosPendientes)}" class="alert alert-info" role="alert">
+            <div class="fw-semibold mb-1">🔔 Recordatorios pendientes</div>
+            <div th:each="r : ${recordatoriosPendientes}" class="d-flex justify-content-between align-items-center">
+                <span><span th:text="${r.titulo}"></span> <span class="small-sec" th:text="${'(' + #temporals.format(r.fecha, 'dd/MM/yyyy') + ')'}"></span></span>
+                <form th:action="@{/recordatorios/completar/{id}(id=${r.id})}" method="post" class="d-inline"><button type="submit" class="btn-accion">Hecho</button></form>
+            </div>
+        </div>
+
         <!-- === TARJETAS RESUMEN === -->
         <div class="row g-3 mb-4">
             <div class="col-12 col-sm-6 col-lg-3">
                 <div class="card-dashboard fade-in">
                     <div style="font-size: 24px; margin-bottom: 4px;">💰</div>
                     <div class="card-title">Ingresos del mes</div>
-                    <div class="card-value income" th:text="${'$' + #numbers.formatDecimal(totalIngresos, 0, 'COMMA', 2, 'POINT')}">$0.00</div>
+                    <div class="card-value income" th:text="${simbolo + #numbers.formatDecimal(totalIngresos, 0, 'COMMA', 2, 'POINT')}">$0.00</div>
                 </div>
             </div>
             <div class="col-12 col-sm-6 col-lg-3">
                 <div class="card-dashboard fade-in">
                     <div style="font-size: 24px; margin-bottom: 4px;">💳</div>
                     <div class="card-title">Gastos del mes</div>
-                    <div class="card-value expense" th:text="${'$' + #numbers.formatDecimal(totalGastos, 0, 'COMMA', 2, 'POINT')}">$0.00</div>
+                    <div class="card-value expense" th:text="${simbolo + #numbers.formatDecimal(totalGastos, 0, 'COMMA', 2, 'POINT')}">$0.00</div>
                 </div>
             </div>
             <div class="col-12 col-sm-6 col-lg-3">
                 <div class="card-dashboard fade-in">
                     <div style="font-size: 24px; margin-bottom: 4px;">🏦</div>
                     <div class="card-title">Balance disponible</div>
-                    <div class="card-value" th:text="${'$' + #numbers.formatDecimal(balance, 0, 'COMMA', 2, 'POINT')}" th:style="${balance < 0} ? 'color: #E53935;' : ''">$0.00</div>
+                    <div class="card-value" th:text="${simbolo + #numbers.formatDecimal(balance, 0, 'COMMA', 2, 'POINT')}" th:style="${balance < 0} ? 'color: #E53935;' : ''">$0.00</div>
                 </div>
             </div>
             <div class="col-12 col-sm-6 col-lg-3">
@@ -51,13 +64,13 @@
             <div class="col-6 col-lg-3 d-flex">
                 <div class="card-dashboard text-center flex-fill">
                     <div style="font-size: 13px; color: #7A7A7A; font-weight: 600;">📆 Gasto promedio/día</div>
-                    <div style="font-size: 22px; font-weight: 700; color: #E53935;" th:text="${'$' + #numbers.formatDecimal(gastoPromedioDiario, 0, 'COMMA', 2, 'POINT')}">$0</div>
+                    <div style="font-size: 22px; font-weight: 700; color: #E53935;" th:text="${simbolo + #numbers.formatDecimal(gastoPromedioDiario, 0, 'COMMA', 2, 'POINT')}">$0</div>
                 </div>
             </div>
             <div class="col-6 col-lg-3 d-flex">
                 <div class="card-dashboard text-center flex-fill">
                     <div style="font-size: 13px; color: #7A7A7A; font-weight: 600;">💸 Mayor gasto del mes</div>
-                    <div style="font-size: 16px; font-weight: 700; color: #E53935;" th:if="${diaMayorGasto != null}" th:text="${'$' + #numbers.formatDecimal(diaMayorGasto.monto, 0, 'COMMA', 2, 'POINT')}">$0</div>
+                    <div style="font-size: 16px; font-weight: 700; color: #E53935;" th:if="${diaMayorGasto != null}" th:text="${simbolo + #numbers.formatDecimal(diaMayorGasto.monto, 0, 'COMMA', 2, 'POINT')}">$0</div>
                     <div style="font-size: 11px; color: #7A7A7A;" th:if="${diaMayorGasto != null}" th:text="${diaMayorGasto.dia}"></div>
                     <div style="font-size: 13px; color: #7A7A7A;" th:unless="${diaMayorGasto != null}">Sin datos</div>
                 </div>
@@ -89,13 +102,13 @@
             </div>
             <div th:each="p : ${presupuestos}" class="mb-3">
                 <div class="d-flex justify-content-between mb-1">
-                    <span style="font-size: 14px; font-weight: 500;" th:text="${p.categoria}"></span>
+                    <span th:text="${p.categoria}"></span>
                     <span style="font-size: 13px; color: #7A7A7A;" th:text="${p.porcentaje + '%'}"></span>
                 </div>
                 <div class="progress-custom">
                     <div class="progress-bar" role="progressbar" style="width: 0%; background: #4CAF50;" th:style="${'width: ' + (p.porcentaje > 100 ? 100 : p.porcentaje) + '%; background: ' + (p.excedido ? '#E53935' : '#4CAF50') + ';'}"></div>
                 </div>
-                <div style="font-size: 12px; color: #7A7A7A; margin-top: 2px;" th:text="${'$' + #numbers.formatDecimal(p.gastado, 0, 'COMMA', 2, 'POINT') + ' de $' + #numbers.formatDecimal(p.limite, 0, 'COMMA', 2, 'POINT')}"></div>
+                <div style="font-size: 12px; color: #7A7A7A; margin-top: 2px;" th:text="${simbolo + #numbers.formatDecimal(p.gastado, 0, 'COMMA', 2, 'POINT') + ' de ' + simbolo + #numbers.formatDecimal(p.limite, 0, 'COMMA', 2, 'POINT')}"></div>
             </div>
         </div>
 
@@ -168,10 +181,10 @@
                     </thead>
                     <tbody>
                         <tr th:each="g : ${movimientosRecientes}">
-                            <td th:text="${g.fecha}"></td>
+                            <td th:text="${#temporals.format(g.fecha, 'dd/MM/yyyy')}"></td>
                             <td th:text="${g.categoria.nombre}"></td>
                             <td th:text="${g.descripcion}"></td>
-                            <td th:text="${g.montoStr}" th:style="${g.tipo == 'INGRESO'} ? 'color:#4CAF50;font-weight:600;' : 'color:#E53935;font-weight:600;'"></td>
+                            <td th:class="${g.tipo == 'INGRESO'} ? 'text-ingreso' : 'text-gasto'" th:text="${(g.tipo == 'INGRESO' ? '+' : '-') + simbolo + #numbers.formatDecimal(g.monto, 0, 'COMMA', 2, 'POINT')}"></td>
                         </tr>
                     </tbody>
                 </table>

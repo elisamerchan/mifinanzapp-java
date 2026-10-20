@@ -1,24 +1,36 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
-    <nav th:fragment="sidebar" class="sidebar">
+    <nav th:fragment="sidebar" class="sidebar" aria-label="Menú principal">
         <div class="sidebar-logo">
-            <div class="sidebar-logo-icon">M</div>
+            <div class="sidebar-logo-icon" aria-hidden="true">M</div>
             <span class="sidebar-logo-text">Mi FinanzApp</span>
         </div>
         <div class="sidebar-menu">
             <a th:href="@{/dashboard}" th:classappend="${#strings.contains(currentUri, 'dashboard')} ? 'active' : ''">Inicio</a>
+
+            <div class="sidebar-section">Movimientos</div>
             <a th:href="@{/movimientos/nuevo}" th:classappend="${#strings.contains(currentUri, 'movimientos/nuevo')} ? 'active' : ''">Registrar movimiento</a>
+            <a th:href="@{/ingresos}" th:classappend="${#strings.contains(currentUri, 'ingresos')} ? 'active' : ''">Ingresos</a>
+            <a th:href="@{/gastos}" th:classappend="${#strings.contains(currentUri, 'gastos')} ? 'active' : ''">Gastos</a>
             <a th:href="@{/historial}" th:classappend="${#strings.contains(currentUri, 'historial')} ? 'active' : ''">Historial</a>
             <a th:href="@{/categorias}" th:classappend="${#strings.contains(currentUri, 'categorias')} ? 'active' : ''">Categorías</a>
-            <a th:href="@{/reportes}" th:classappend="${#strings.contains(currentUri, 'reportes')} ? 'active' : ''">Reportes y análisis</a>
+
+            <div class="sidebar-section">Planificación</div>
             <a th:href="@{/presupuestos}" th:classappend="${#strings.contains(currentUri, 'presupuestos')} ? 'active' : ''">Presupuesto mensual</a>
             <a th:href="@{/recordatorios}" th:classappend="${#strings.contains(currentUri, 'recordatorios')} ? 'active' : ''">Recordatorios</a>
+
+            <div class="sidebar-section">Análisis</div>
+            <a th:href="@{/reportes}" th:classappend="${#strings.contains(currentUri, 'reportes')} ? 'active' : ''">Reportes y análisis</a>
+
+            <div class="sidebar-section">Aprender</div>
             <a th:href="@{/educacion}" th:classappend="${#strings.contains(currentUri, 'educacion')} ? 'active' : ''">Contenido educativo</a>
-            <a th:href="@{/configuracion}" th:classappend="${#strings.contains(currentUri, 'configuracion')} ? 'active' : ''">Configuración</a>
         </div>
-        <div class="sidebar-menu" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 8px;">
-            <a th:href="@{/auth/logout}">Cerrar sesión</a>
+        <div class="sidebar-menu sidebar-footer">
+            <a th:href="@{/configuracion}" th:classappend="${#strings.contains(currentUri, 'configuracion')} ? 'active' : ''">Configuración</a>
+            <form th:action="@{/auth/logout}" method="post">
+                <button type="submit" class="sidebar-logout">Cerrar sesión</button>
+            </form>
         </div>
     </nav>
 </body>

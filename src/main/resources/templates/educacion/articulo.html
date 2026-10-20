@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:replace="~{fragments/head :: head(${articulo.titulo})}"></head>
+<body>
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    <div class="main-content">
+        <div th:replace="~{fragments/header :: header(${articulo.titulo})}"></div>
+
+        <a th:href="@{/educacion}" class="btn-accion d-inline-block mb-3">&larr; Volver al contenido educativo</a>
+
+        <article class="card-dashboard articulo mb-4">
+            <div class="small-sec mb-2" th:text="${'Lectura de ' + articulo.minutos + ' minutos'}"></div>
+            <!-- El slug se valida contra una lista cerrada en el controlador -->
+            <div th:replace="~{'educacion/articulos/' + ${articulo.slug} :: contenido}"></div>
+        </article>
+
+        <div class="card-dashboard">
+            <div class="card-title mb-3">Sigue aprendiendo</div>
+            <ul class="mb-0">
+                <li th:each="o : ${otros}"><a th:href="@{/educacion/{slug}(slug=${o.slug})}" th:text="${o.titulo}"></a></li>
+            </ul>
+        </div>
+    </div>
+    <div th:replace="~{fragments/scripts :: scripts}"></div>
+</body>
+</html>

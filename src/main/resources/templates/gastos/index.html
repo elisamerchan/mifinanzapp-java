@@ -10,79 +10,91 @@
             <div class="col-12 col-lg-4">
                 <div class="card-dashboard">
                     <div class="card-title mb-3" th:text="${gasto.id != null} ? 'Editar gasto' : 'Nuevo gasto'"></div>
-                    <form th:action="@{/gastos/guardar}" th:object="${gasto}" method="post">
+                    <form id="form-gasto" th:action="@{/gastos/guardar}" th:object="${gasto}" method="post">
                         <input type="hidden" th:field="*{id}">
                         <div class="mb-3">
-                            <label class="form-label" style="font-size: 14px; font-weight: 500;">Monto</label>
-                            <input type="number" step="0.01" th:field="*{monto}" class="form-control form-custom" required>
+                            <label class="form-label" for="monto">Monto</label>
+                            <input type="number" step="0.01" min="0.01" id="monto" th:field="*{monto}" class="form-control form-custom" th:errorclass="is-invalid" required>
+                            <div class="invalid-feedback" th:errors="*{monto}"></div>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label" style="font-size: 14px; font-weight: 500;">Categoría</label>
-                            <select th:field="*{categoria.id}" class="form-select form-custom" required>
+                            <label class="form-label" for="categoria">Categoría</label>
+                            <select id="categoria" th:field="*{categoria.id}" class="form-select form-custom" required>
                                 <option value="">Seleccionar...</option>
                                 <option th:each="cat : ${categorias}" th:value="${cat.id}" th:text="${cat.nombre}"></option>
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label" style="font-size: 14px; font-weight: 500;">Método de pago</label>
-                            <select th:field="*{metodoPago}" class="form-select form-custom" required>
+                            <label class="form-label" for="metodoPago">Método de pago</label>
+                            <select id="metodoPago" th:field="*{metodoPago}" class="form-select form-custom" th:errorclass="is-invalid" required>
                                 <option value="">Seleccionar...</option>
                                 <option th:each="m : ${metodosPago}" th:value="${m}" th:text="${m}"></option>
                             </select>
+                            <div class="invalid-feedback" th:errors="*{metodoPago}"></div>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label" style="font-size: 14px; font-weight: 500;">Fecha</label>
-                            <input type="date" th:field="*{fecha}" class="form-control form-custom" required>
+                            <label class="form-label" for="fecha">Fecha</label>
+                            <input type="date" id="fecha" th:field="*{fecha}" class="form-control form-custom" th:errorclass="is-invalid" required>
+                            <div class="invalid-feedback" th:errors="*{fecha}"></div>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label" style="font-size: 14px; font-weight: 500;">Descripción</label>
-                            <textarea th:field="*{descripcion}" class="form-control form-custom" rows="2"></textarea>
+                            <label class="form-label" for="descripcion">Descripción</label>
+                            <textarea id="descripcion" th:field="*{descripcion}" class="form-control form-custom" th:errorclass="is-invalid" rows="2" maxlength="255"></textarea>
+                            <div class="invalid-feedback" th:errors="*{descripcion}"></div>
                         </div>
                         <button type="submit" class="btn-primary-custom w-100">
                             <span th:text="${gasto.id != null} ? 'Actualizar' : 'Guardar'"></span>
                         </button>
-                        <a th:if="${gasto.id != null}" th:href="@{/gastos}" class="btn w-100 mt-2" style="border-radius: 10px; border: 1.5px solid #E0E0E0;">Cancelar</a>
+                        <a th:if="${gasto.id != null}" th:href="@{/gastos}" class="btn btn-outline-custom w-100 mt-2">Cancelar</a>
                     </form>
                 </div>
             </div>
             <div class="col-12 col-lg-8">
                 <div class="card-dashboard">
                     <div class="card-title mb-3">Mis gastos</div>
-                    <div class="table-responsive">
+                    <div th:if="${#lists.isEmpty(gastos)}" class="empty-state">
+                        <div class="empty-icon">&#128179;</div>
+                        <p>Aún no tienes gastos registrados. Usa el formulario para añadir el primero.</p>
+                    </div>
+                    <div th:unless="${#lists.isEmpty(gastos)}" class="table-responsive">
                         <table class="table table-dashboard">
                             <thead>
                                 <tr><th>Fecha</th><th>Categoría</th><th>Descripción</th><th>Método</th><th>Monto</th><th>Acciones</th></tr>
                             </thead>
                             <tbody>
                                 <tr th:each="g : ${gastos}">
-                                    <td th:text="${g.fecha}"></td>
+                                    <td th:text="${#temporals.format(g.fecha, 'dd/MM/yyyy')}"></td>
                                     <td th:text="${g.categoria.nombre}"></td>
                                     <td th:text="${g.descripcion}"></td>
                                     <td th:text="${g.metodoPago}"></td>
-                                    <td style="color: #E53935; font-weight: 600;" th:text="${'-$' + #numbers.formatDecimal(g.monto, 0, 'COMMA', 2, 'POINT')}"></td>
+                                    <td class="text-gasto" th:text="${'-' + simbolo + #numbers.formatDecimal(g.monto, 0, 'COMMA', 2, 'POINT')}"></td>
                                     <td>
-                                        <a th:href="@{/gastos/editar/{id}(id=${g.id})}" style="color: #6E71C4; font-size: 13px;">Editar</a>
-                                        <a th:href="@{/gastos/eliminar/{id}(id=${g.id})}" style="color: #E53935; font-size: 13px; margin-left: 8px;" onclick="return confirm('¿Eliminar?')">Eliminar</a>
+                                        <a th:href="@{/gastos/editar/{id}(id=${g.id})}" class="btn-accion">Editar</a>
+                                        <form th:action="@{/gastos/eliminar/{id}(id=${g.id})}" method="post" class="form-inline" onsubmit="return confirm('¿Eliminar este gasto?')">
+                                            <button type="submit" class="btn-accion peligro">Eliminar</button>
+                                        </form>
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
+                    <div th:replace="~{fragments/paginacion :: paginacion(${pagina}, ${totalPaginas}, '/gastos')}"></div>
                 </div>
             </div>
         </div>
     </div>
     <div th:replace="~{fragments/scripts :: scripts}"></div>
     <script th:inline="javascript">
-        const balance = [[${balance}]];
-        document.querySelector('form[action*="/gastos/guardar"]').addEventListener('submit', function(e) {
-            const montoInput = this.querySelector('input[name="monto"]');
-            if (!montoInput) return;
-            const monto = parseFloat(montoInput.value);
-            if (monto > balance) {
-                if (!confirm('Este gasto de $' + monto.toFixed(2) + ' supera tu saldo disponible de $' + balance.toFixed(2) + '. Tu balance quedará en negativo. \u00BFDeseas continuar?')) {
-                    e.preventDefault();
-                }
+        // Aviso si el gasto deja el balance en negativo (solo al crear)
+        const balance = /*[[${balance}]]*/ 0;
+        const simbolo = /*[[${simbolo}]]*/ '$';
+        document.getElementById('form-gasto').addEventListener('submit', function (e) {
+            const monto = parseFloat(this.querySelector('input[name="monto"]').value);
+            const esNuevo = !this.querySelector('input[name="id"]').value;
+            if (esNuevo && monto > balance
+                && !confirm('Este gasto de ' + simbolo + monto.toFixed(2) + ' supera tu saldo disponible de '
+                    + simbolo + balance.toFixed(2) + '. Tu balance quedará en negativo. ¿Deseas continuar?')) {
+                e.preventDefault();
             }
         });
     </script>

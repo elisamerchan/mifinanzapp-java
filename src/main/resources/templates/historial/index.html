@@ -11,28 +11,45 @@
                 <div class="card-dashboard mb-4">
                     <form method="get" class="filters-bar">
                         <div>
-                            <label style="font-size: 12px; color: #7A7A7A; font-weight: 600;">Desde</label>
-                            <input type="date" name="desde" class="form-control" th:value="${desde}">
+                            <label class="small-sec fw-semibold" for="desde">Desde</label>
+                            <input type="date" id="desde" name="desde" class="form-control" th:value="${desde}">
                         </div>
                         <div>
-                            <label style="font-size: 12px; color: #7A7A7A; font-weight: 600;">Hasta</label>
-                            <input type="date" name="hasta" class="form-control" th:value="${hasta}">
+                            <label class="small-sec fw-semibold" for="hasta">Hasta</label>
+                            <input type="date" id="hasta" name="hasta" class="form-control" th:value="${hasta}">
                         </div>
                         <div>
-                            <label style="font-size: 12px; color: #7A7A7A; font-weight: 600;">Categoría</label>
-                            <select name="categoriaId" class="form-select">
+                            <label class="small-sec fw-semibold" for="tipo">Tipo</label>
+                            <select id="tipo" name="tipo" class="form-select">
+                                <option value="">Todos</option>
+                                <option value="INGRESO" th:selected="${tipo == 'INGRESO'}">Ingresos</option>
+                                <option value="GASTO" th:selected="${tipo == 'GASTO'}">Gastos</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="small-sec fw-semibold" for="categoriaId">Categoría</label>
+                            <select id="categoriaId" name="categoriaId" class="form-select">
                                 <option value="">Todas</option>
                                 <option th:each="cat : ${categorias}" th:value="${cat.id}" th:text="${cat.icono != null} ? ${cat.icono + ' ' + cat.nombre} : ${cat.nombre}" th:selected="${categoriaId == cat.id}"></option>
                             </select>
                         </div>
+                        <div>
+                            <label class="small-sec fw-semibold" for="q">Buscar</label>
+                            <input type="search" id="q" name="q" class="form-control" placeholder="Descripción" th:value="${q}">
+                        </div>
                         <div style="align-self: flex-end;">
-                            <button type="submit" class="btn-primary-custom" style="padding: 8px 20px;">Filtrar</button>
+                            <button type="submit" class="btn-primary-custom">Filtrar</button>
                         </div>
                     </form>
                 </div>
 
                 <div class="card-dashboard">
-                    <div class="table-responsive">
+                    <div th:if="${#lists.isEmpty(movimientos)}" class="empty-state">
+                        <div class="empty-icon">&#128203;</div>
+                        <p>No hay movimientos con estos filtros.</p>
+                        <a th:href="@{/movimientos/nuevo}" class="btn-primary-custom">Registrar movimiento</a>
+                    </div>
+                    <div th:unless="${#lists.isEmpty(movimientos)}" class="table-responsive">
                         <table class="table table-dashboard">
                             <thead>
                                 <tr>
@@ -46,48 +63,47 @@
                             </thead>
                             <tbody>
                                 <tr th:each="m : ${movimientos}">
-                                    <td th:text="${m.fecha}"></td>
+                                    <td th:text="${#temporals.format(m.fecha, 'dd/MM/yyyy')}"></td>
                                     <td>
                                         <span th:if="${m.tipo == 'INGRESO'}" class="badge-income">💰 Ingreso</span>
                                         <span th:if="${m.tipo == 'GASTO'}" class="badge-expense">💳 Gasto</span>
                                     </td>
                                     <td th:text="${m.categoria}"></td>
                                     <td th:text="${m.descripcion}"></td>
-                                    <td th:text="${m.montoStr}" th:style="${m.tipo == 'INGRESO'} ? 'color:#4CAF50;font-weight:600;' : 'color:#E53935;font-weight:600;'"></td>
+                                    <td th:class="${m.tipo == 'INGRESO'} ? 'text-ingreso' : 'text-gasto'"
+                                        th:text="${(m.tipo == 'INGRESO' ? '+' : '-') + simbolo + #numbers.formatDecimal(m.monto, 0, 'COMMA', 2, 'POINT')}"></td>
                                     <td>
-                                        <a th:if="${m.tipo == 'INGRESO'}" th:href="@{/ingresos/editar/{id}(id=${m.id})}" style="color: #6E71C4; font-size: 13px;">Editar</a>
-                                        <a th:if="${m.tipo == 'GASTO'}" th:href="@{/gastos/editar/{id}(id=${m.id})}" style="color: #6E71C4; font-size: 13px;">Editar</a>
-                                        <a th:if="${m.tipo == 'INGRESO'}" th:href="@{/ingresos/eliminar/{id}(id=${m.id})}" style="color: #E53935; font-size: 13px; margin-left: 8px;" onclick="return confirm('¿Eliminar?')">Eliminar</a>
-                                        <a th:if="${m.tipo == 'GASTO'}" th:href="@{/gastos/eliminar/{id}(id=${m.id})}" style="color: #E53935; font-size: 13px; margin-left: 8px;" onclick="return confirm('¿Eliminar?')">Eliminar</a>
+                                        <a th:href="${m.tipo == 'INGRESO'} ? @{/ingresos/editar/{id}(id=${m.id})} : @{/gastos/editar/{id}(id=${m.id})}" class="btn-accion">Editar</a>
+                                        <form th:action="${m.tipo == 'INGRESO'} ? @{/ingresos/eliminar/{id}(id=${m.id})} : @{/gastos/eliminar/{id}(id=${m.id})}" method="post" class="form-inline" onsubmit="return confirm('¿Eliminar este movimiento?')">
+                                            <button type="submit" class="btn-accion peligro">Eliminar</button>
+                                        </form>
                                     </td>
-                                </tr>
-                                <tr th:if="${#lists.isEmpty(movimientos)}">
-                                    <td colspan="6" class="text-center" style="color: #7A7A7A; padding: 32px;">No hay movimientos en este período</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
+                    <div th:replace="~{fragments/paginacion :: paginacion(${pagina}, ${totalPaginas}, '/historial')}"></div>
                 </div>
             </div>
 
             <div class="col-12 col-lg-3">
                 <div class="card-dashboard mb-3">
                     <div class="card-title mb-3">Resumen del período</div>
-                    <div style="padding: 12px 0; border-bottom: 1px solid #F0F0F0;">
-                        <div style="font-size: 12px; color: #7A7A7A;">Ingresos</div>
-                        <div style="font-size: 20px; font-weight: 700; color: #4CAF50;" th:text="${totalIngresosStr}"></div>
+                    <div class="py-2 border-bottom">
+                        <div class="small-sec">Ingresos</div>
+                        <div class="fs-5 fw-bold text-ingreso" th:text="${'+' + simbolo + #numbers.formatDecimal(totalIngresos, 0, 'COMMA', 2, 'POINT')}"></div>
                     </div>
-                    <div style="padding: 12px 0; border-bottom: 1px solid #F0F0F0;">
-                        <div style="font-size: 12px; color: #7A7A7A;">Gastos</div>
-                        <div style="font-size: 20px; font-weight: 700; color: #E53935;" th:text="${totalGastosStr}"></div>
+                    <div class="py-2 border-bottom">
+                        <div class="small-sec">Gastos</div>
+                        <div class="fs-5 fw-bold text-gasto" th:text="${'-' + simbolo + #numbers.formatDecimal(totalGastos, 0, 'COMMA', 2, 'POINT')}"></div>
                     </div>
-                    <div style="padding: 12px 0;">
-                        <div style="font-size: 12px; color: #7A7A7A;">Balance</div>
-                        <div style="font-size: 24px; font-weight: 700;" th:text="${balanceStr}" th:style="${balance < 0} ? 'color: #E53935;' : 'color: #4CAF50;'"></div>
+                    <div class="py-2">
+                        <div class="small-sec">Balance</div>
+                        <div class="fs-4 fw-bold" th:classappend="${balance < 0} ? 'text-gasto' : 'text-ingreso'" th:text="${simbolo + #numbers.formatDecimal(balance, 0, 'COMMA', 2, 'POINT')}"></div>
                     </div>
                 </div>
-                <div class="card-dashboard text-center" style="padding: 16px;">
-                    <a th:href="@{/movimientos/nuevo}" class="btn-primary-custom w-100">+ Nuevo movimiento</a>
+                <div class="card-dashboard text-center">
+                    <a th:href="@{/movimientos/nuevo}" class="btn-primary-custom w-100 d-inline-block text-decoration-none">+ Nuevo movimiento</a>
                 </div>
             </div>
         </div>

@@ -11,6 +11,9 @@
     --text-secondary: #7A7A7A;
     --income: #4CAF50;
     --expense: #E53935;
+    --warning: #FF9800;
+    --border: #E0E0E0;
+    --border-light: #F0F0F0;
     --sidebar-width: 260px;
     --sidebar-collapsed: 70px;
     --radius: 12px;
@@ -42,3 +45,45 @@ body {
 
 /* === ALERT === */
 .alert { border: none; }
+
+/* === UTILIDADES === */
+.text-ingreso { color: var(--income); font-weight: 600; }
+.text-gasto { color: var(--expense); font-weight: 600; }
+.text-sec { color: var(--text-secondary); }
+.small-sec { color: var(--text-secondary); font-size: 13px; }
+.form-label { font-size: 14px; font-weight: 500; }
+
+/* Botones con aspecto de enlace (acciones de fila) */
+.btn-accion {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 13px;
+    color: var(--primary);
+    text-decoration: none;
+    cursor: pointer;
+}
+.btn-accion.peligro { color: var(--expense); }
+.btn-accion:hover { text-decoration: underline; }
+.btn-accion:focus-visible,
+a:focus-visible,
+button:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+.form-inline { display: inline; margin-left: 8px; }
+
+.btn-outline-custom {
+    border-radius: 10px;
+    border: 1.5px solid var(--border);
+    background: transparent;
+}
+
+/* Paginación */
+.pagination .page-link { color: var(--primary); border-radius: var(--radius-sm); margin: 0 2px; }
+.pagination .active .page-link { background: var(--primary); border-color: var(--primary); color: white; }
+
+/* Artículos educativos */
+.articulo { max-width: 760px; line-height: 1.7; }
+.articulo h2 { font-size: 20px; font-weight: 700; margin: 24px 0 8px; }
+.articulo p, .articulo li { font-size: 15px; }

@@ -95,3 +95,35 @@
         padding: 16px;
     }
 }
+
+.sidebar-section {
+    padding: 14px 14px 4px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: rgba(255, 255, 255, 0.45);
+}
+
+.sidebar-footer {
+    flex: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 8px;
+}
+
+.sidebar-logout {
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    padding: 10px 14px;
+    color: rgba(255, 255, 255, 0.7);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.sidebar-logout:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}

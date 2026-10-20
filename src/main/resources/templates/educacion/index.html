@@ -6,51 +6,63 @@
     <div class="main-content">
         <div th:replace="~{fragments/header :: header('Contenido educativo')}"></div>
 
-        <div class="row g-4">
-            <div class="col-12 col-md-6 col-lg-4">
-                <div class="card-dashboard h-100">
-                    <div style="font-size: 32px; margin-bottom: 12px;">&#128176;</div>
-                    <h5 style="font-weight: 700;">Ahorro inteligente</h5>
-                    <p style="color: #7A7A7A; font-size: 14px;">Destina al menos el 20% de tus ingresos al ahorro. Automatiza tus ahorros para que sea más fácil cumplir esta meta.</p>
-                </div>
+        <!-- Consejos según los datos del usuario -->
+        <div class="card-dashboard mb-4" style="background: linear-gradient(135deg, #6E71C4, #2F3264); color: white;">
+            <div class="small fw-semibold text-uppercase mb-2" style="opacity: .8;">💡 Para ti, este mes</div>
+            <p th:each="c : ${consejos}" class="mb-2" th:text="${c}"></p>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-12 col-md-6 col-lg-4" th:each="a : ${articulos}">
+                <a th:href="@{/educacion/{slug}(slug=${a.slug})}" class="text-decoration-none text-reset">
+                    <div class="card-dashboard h-100">
+                        <div class="fs-2 mb-2" aria-hidden="true" th:text="${a.icono}"></div>
+                        <h2 class="h5 fw-bold" th:text="${a.titulo}"></h2>
+                        <p class="small-sec" th:text="${a.resumen}"></p>
+                        <span class="small text-primary" th:text="${'Leer · ' + a.minutos + ' min'}"></span>
+                    </div>
+                </a>
             </div>
-            <div class="col-12 col-md-6 col-lg-4">
-                <div class="card-dashboard h-100">
-                    <div style="font-size: 32px; margin-bottom: 12px;">&#128202;</div>
-                    <h5 style="font-weight: 700;">Presupuesto mensual</h5>
-                    <p style="color: #7A7A7A; font-size: 14px;">Planifica tus gastos antes de que comience el mes. Asigna un límite a cada categoría y respétalo para mantener el control.</p>
+        </div>
+
+        <!-- Calculadora de ahorro: no guarda nada, todo ocurre en el navegador -->
+        <div class="card-dashboard">
+            <div class="card-title mb-3">🎯 Calculadora de meta de ahorro</div>
+            <form id="calc-ahorro" class="row g-3 align-items-end" onsubmit="return false">
+                <div class="col-12 col-md-3">
+                    <label class="form-label" for="meta">Meta</label>
+                    <input type="number" id="meta" min="1" step="0.01" class="form-control form-custom" value="1000">
                 </div>
-            </div>
-            <div class="col-12 col-md-6 col-lg-4">
-                <div class="card-dashboard h-100">
-                    <div style="font-size: 32px; margin-bottom: 12px;">&#128200;</div>
-                    <h5 style="font-weight: 700;">Control de deudas</h5>
-                    <p style="color: #7A7A7A; font-size: 14px;">Prioriza el pago de deudas con mayor interés. Considera la regla 50/30/20 para gestionar tus finanzas personales.</p>
+                <div class="col-12 col-md-3">
+                    <label class="form-label" for="meses">Plazo (meses)</label>
+                    <input type="number" id="meses" min="1" max="600" class="form-control form-custom" value="12">
                 </div>
-            </div>
-            <div class="col-12 col-md-6 col-lg-4">
-                <div class="card-dashboard h-100">
-                    <div style="font-size: 32px; margin-bottom: 12px;">&#128221;</div>
-                    <h5 style="font-weight: 700;">Registro de gastos</h5>
-                    <p style="color: #7A7A7A; font-size: 14px;">Llevar un registro detallado de tus gastos te ayuda a identificar patrones y áreas donde puedes reducir costos innecesarios.</p>
+                <div class="col-12 col-md-3">
+                    <label class="form-label" for="inicial">Ya tengo ahorrado</label>
+                    <input type="number" id="inicial" min="0" step="0.01" class="form-control form-custom" value="0">
                 </div>
-            </div>
-            <div class="col-12 col-md-6 col-lg-4">
-                <div class="card-dashboard h-100">
-                    <div style="font-size: 32px; margin-bottom: 12px;">&#127891;</div>
-                    <h5 style="font-weight: 700;">Educación financiera</h5>
-                    <p style="color: #7A7A7A; font-size: 14px;">Invertir en tu educación financiera es la mejor inversión que puedes hacer. Lee libros, sigue cursos y mantente informado.</p>
+                <div class="col-12 col-md-3">
+                    <div class="small-sec">Debes ahorrar al mes</div>
+                    <div class="fs-4 fw-bold text-ingreso" id="resultado-ahorro" aria-live="polite">—</div>
                 </div>
-            </div>
-            <div class="col-12 col-md-6 col-lg-4">
-                <div class="card-dashboard h-100">
-                    <div style="font-size: 32px; margin-bottom: 12px;">&#128161;</div>
-                    <h5 style="font-weight: 700;">Metas financieras</h5>
-                    <p style="color: #7A7A7A; font-size: 14px;">Define metas SMART (específicas, medibles, alcanzables, relevantes y con plazo definido) para mantener la motivación.</p>
-                </div>
-            </div>
+            </form>
         </div>
     </div>
     <div th:replace="~{fragments/scripts :: scripts}"></div>
+    <script th:inline="javascript">
+        (function () {
+            const simbolo = /*[[${simbolo}]]*/ '$';
+            const f = document.getElementById('calc-ahorro');
+            function calcular() {
+                const meta = parseFloat(f.meta.value), meses = parseInt(f.meses.value, 10), inicial = parseFloat(f.inicial.value) || 0;
+                const out = document.getElementById('resultado-ahorro');
+                if (!(meta > 0) || !(meses > 0)) { out.textContent = '—'; return; }
+                const falta = Math.max(meta - inicial, 0);
+                out.textContent = simbolo + (falta / meses).toLocaleString('es-CO', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
+            f.addEventListener('input', calcular);
+            calcular();
+        })();
+    </script>
 </body>
 </html>

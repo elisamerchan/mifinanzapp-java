@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <!-- pagina: índice base 0; url: ruta del listado (los demás parámetros de consulta se conservan) -->
+    <nav th:fragment="paginacion(pagina, totalPaginas, url)" th:if="${totalPaginas > 1}" aria-label="Paginación">
+        <ul class="pagination pagination-sm justify-content-center mt-3 mb-0">
+            <li class="page-item" th:classappend="${pagina == 0} ? 'disabled'">
+                <a class="page-link" th:href="@{${url}(pagina=${pagina - 1}, desde=${param.desde}, hasta=${param.hasta}, categoriaId=${param.categoriaId}, tipo=${param.tipo}, q=${param.q})}">Anterior</a>
+            </li>
+            <li class="page-item disabled">
+                <span class="page-link" th:text="${(pagina + 1) + ' de ' + totalPaginas}"></span>
+            </li>
+            <li class="page-item" th:classappend="${pagina + 1 >= totalPaginas} ? 'disabled'">
+                <a class="page-link" th:href="@{${url}(pagina=${pagina + 1}, desde=${param.desde}, hasta=${param.hasta}, categoriaId=${param.categoriaId}, tipo=${param.tipo}, q=${param.q})}">Siguiente</a>
+            </li>
+        </ul>
+    </nav>
+</body>
+</html>

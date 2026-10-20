@@ -8,15 +8,24 @@
             </button>
             <div>
                 <h1 th:text="${title}">Título</h1>
-                <p style="color: #7A7A7A; font-size: 14px;" th:if="${nombre != null}">
+                <p class="small-sec mb-0" th:if="${nombre != null}">
                     Bienvenido, <span th:text="${nombre}"></span>
                 </p>
             </div>
         </div>
         <div class="user-info" th:if="${nombre != null}">
-            <span class="user-email" style="color: #7A7A7A; font-size: 14px;" th:text="${email}">correo</span>
-            <div class="user-avatar" th:text="${#strings.substring(nombre, 0, 1)}"></div>
+            <span class="user-email" th:text="${email}">correo</span>
+            <div class="user-avatar" aria-hidden="true" th:text="${#strings.substring(nombre, 0, 1)}"></div>
         </div>
+    </div>
+    <!-- Mensajes flash tras guardar/eliminar (RedirectAttributes) -->
+    <div th:if="${mensaje != null}" class="alert alert-success alert-dismissible fade show" role="status">
+        <span th:text="${mensaje}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+    </div>
+    <div th:if="${error != null}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
     </div>
 </body>
 </html>

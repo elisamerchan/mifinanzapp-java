@@ -17,19 +17,19 @@
             <div class="col-12 col-sm-4">
                 <div class="card-dashboard text-center">
                     <div class="card-title">Total Ingresos</div>
-                    <div class="card-value income" th:text="${'$' + #numbers.formatDecimal(totalIngresos, 0, 'COMMA', 2, 'POINT')}">$0.00</div>
+                    <div class="card-value income" th:text="${simbolo + #numbers.formatDecimal(totalIngresos, 0, 'COMMA', 2, 'POINT')}">$0.00</div>
                 </div>
             </div>
             <div class="col-12 col-sm-4">
                 <div class="card-dashboard text-center">
                     <div class="card-title">Total Gastos</div>
-                    <div class="card-value expense" th:text="${'$' + #numbers.formatDecimal(totalGastos, 0, 'COMMA', 2, 'POINT')}">$0.00</div>
+                    <div class="card-value expense" th:text="${simbolo + #numbers.formatDecimal(totalGastos, 0, 'COMMA', 2, 'POINT')}">$0.00</div>
                 </div>
             </div>
             <div class="col-12 col-sm-4">
                 <div class="card-dashboard text-center">
                     <div class="card-title">Balance</div>
-                    <div class="card-value" th:text="${'$' + #numbers.formatDecimal(balance, 0, 'COMMA', 2, 'POINT')}" th:style="${balance < 0} ? 'color: #E53935;' : ''"></div>
+                    <div class="card-value" th:text="${simbolo + #numbers.formatDecimal(balance, 0, 'COMMA', 2, 'POINT')}" th:style="${balance < 0} ? 'color: #E53935;' : ''"></div>
                 </div>
             </div>
         </div>
@@ -46,7 +46,7 @@
                 <div class="card-dashboard text-center" style="padding: 16px;">
                     <div style="font-size: 24px; margin-bottom: 4px;">💸</div>
                     <div class="card-title" style="font-size: 11px;">Mayor gasto</div>
-                    <div style="font-size: 14px; font-weight: 700; color: #E53935;" th:text="${'$' + #numbers.formatDecimal(maxGasto, 0, 'COMMA', 2, 'POINT')}">$0</div>
+                    <div style="font-size: 14px; font-weight: 700; color: #E53935;" th:text="${simbolo + #numbers.formatDecimal(maxGasto, 0, 'COMMA', 2, 'POINT')}">$0</div>
                     <div style="font-size: 11px; color: #7A7A7A;" th:text="${diaMayorGasto}"></div>
                 </div>
             </div>
@@ -54,7 +54,7 @@
                 <div class="card-dashboard text-center" style="padding: 16px;">
                     <div style="font-size: 24px; margin-bottom: 4px;">🏦</div>
                     <div class="card-title" style="font-size: 11px;">Gasto promedio/día</div>
-                    <div style="font-size: 18px; font-weight: 700;" th:text="${'$' + #numbers.formatDecimal(gastoPromedioDiario, 0, 'COMMA', 2, 'POINT')}">$0</div>
+                    <div style="font-size: 18px; font-weight: 700;" th:text="${simbolo + #numbers.formatDecimal(gastoPromedioDiario, 0, 'COMMA', 2, 'POINT')}">$0</div>
                 </div>
             </div>
             <div class="col-6 col-lg-3">
