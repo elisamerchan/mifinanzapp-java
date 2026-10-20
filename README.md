@@ -9,6 +9,7 @@ Aplicación web para la gestión de finanzas personales. Permite registrar ingre
 | Backend | Java 17, Spring Boot 3.2.5 |
 | Frontend | Thymeleaf, Bootstrap 5.3.3, Chart.js 4.4.1 |
 | Base de datos | PostgreSQL (Neon.tech) |
+| Acceso a datos | Spring Data JPA/Hibernate + JDBC explícito (`JdbcTemplate`) |
 | Build | Maven |
 | Cache | Caffeine (2 min TTL) |
 | Seguridad | Spring Security + BCrypt |
@@ -69,11 +70,49 @@ pnpm install
 
 La aplicación estará disponible en `http://localhost:8080`.
 
-### 4. Acceso
+### 4. Pruebas
+
+```bash
+./mvnw.cmd test
+```
+
+Ninguna prueba usa PostgreSQL:
+
+- **Unitarias de servicios** (JUnit 5 + Mockito): reglas de negocio y autorización por propietario.
+- **`IngresoJdbcRepositoryTest`**: SQL real contra H2 en memoria (modo PostgreSQL).
+- **`FlujoWebTest`**: contexto completo con `MockMvc` sobre H2 (`src/test/resources/application.properties`): CSRF, validación, acceso a registros ajenos y carga de las páginas principales.
+
+Límite conocido: el SQL se prueba en H2, no en PostgreSQL; conviene una prueba manual tras cambiar consultas.
+
+### 5. Perfiles y despliegue
+
+| Perfil | Uso | Diferencias |
+|--------|-----|-------------|
+| *(por defecto)* | Desarrollo | `ddl-auto=update`, plantillas sin caché |
+| `prod` | Producción (`SPRING_PROFILES_ACTIVE=prod`) | `ddl-auto=validate` (el esquema debe existir), cookies de sesión `secure`, plantillas en caché |
+
+En producción define `DB_URL`, `DB_USER` y `DB_PASSWORD` como variables del servidor (no uses `.env`), sirve la aplicación por HTTPS y arranca el jar con `java -jar target/mi-finanzapp-1.0.0.jar`. Antes de usar `prod` por primera vez, arranca una vez en el perfil por defecto para que Hibernate cree las tablas y columnas nuevas (por ejemplo `recordatorios.completado`).
+
+### 6. Acceso
 
 1. Regístrate en `/auth/registro` — se crearán categorías predeterminadas automáticamente
 2. Inicia sesión en `/auth/login`
 3. El dashboard principal mostrará tus finanzas
+
+## JDBC y JPA
+
+- **JDBC explícito** (`IngresoJdbcRepository`, SQL parametrizado con `JdbcTemplate`): crear, listar, buscar por id y usuario, actualizar y eliminar **ingresos**. Todas las consultas filtran por el usuario autenticado; si el ingreso no existe o es de otro usuario se responde 404.
+- **JPA** sigue en: gastos, categorías, presupuestos, recordatorios, usuarios y las consultas agregadas de ingresos (`IngresoRepository`: totales, evolución mensual, dashboard y reportes).
+- La protección CSRF está activa: todos los borrados y el cierre de sesión son `POST` con token.
+- Las decisiones de diseño están en [`docs/decisiones.md`](docs/decisiones.md) y el historial de cambios en [`CHANGELOG.md`](CHANGELOG.md).
+
+## Funcionalidades
+
+- **Movimientos:** ingresos y gastos con validación, edición, borrado y paginación; historial con filtros (fecha, tipo, categoría, texto).
+- **Planificación:** presupuestos mensuales por categoría con alertas al 80 % y 100 %; recordatorios con estado «hecho» y aviso de vencidos.
+- **Análisis:** dashboard y reportes con gráficos.
+- **Aprender:** 5 artículos, consejos personalizados según tus datos y calculadora de meta de ahorro.
+- **Preferencias:** moneda (símbolo en todos los importes) y nombre en Configuración. El idioma se guarda pero la interfaz está solo en español.
 
 ## Estructura del Proyecto
 
@@ -104,7 +143,7 @@ mi-finanzapp/
 │   │       │   └── vendor/      # Librerías externas (Bootstrap, Chart.js)
 │   │       └── templates/       # Plantillas Thymeleaf
 │   └── test/java/com/mifinanzapp/
-│       └── ...                  # Tests unitarios
+│       └── ...                  # Unitarias, JDBC sobre H2 y flujo web
 └── scripts/
     └── copy-vendor.js           # Script para copiar assets de node_modules
 ```
@@ -116,7 +155,7 @@ mi-finanzapp/
 | `/auth/login` | GET | Página de inicio de sesión |
 | `/auth/registro` | GET/POST | Registro de usuario |
 | `/dashboard` | GET | Dashboard principal con resumen financiero |
-| `/ingresos` | GET/POST | Gestión de ingresos |
+| `/ingresos` | GET/POST | Gestión de ingresos (paginado) |
 | `/gastos` | GET/POST | Gestión de gastos |
 | `/movimientos/nuevo` | GET/POST | Registro rápido de movimientos |
 | `/presupuestos` | GET/POST | Administración de presupuestos |
