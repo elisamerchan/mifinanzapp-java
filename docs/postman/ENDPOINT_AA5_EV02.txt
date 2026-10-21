@@ -1,0 +1,49 @@
+ENDPOINTS DE LA API - Mi FinanzApp (GA7-220501096-AA5-EV02)
+Aprendiz: Elisa Nohemi Merchan Carrillo
+Repositorio: https://github.com/elisamerchan/mifinanzapp-java
+
+URL base (local): http://localhost:8080
+Formato: JSON (Content-Type: application/json). Rutas públicas, sin token ni sesión.
+El "usuario" es el email con el que se registra la cuenta.
+
+------------------------------------------------------------
+1) REGISTRO
+------------------------------------------------------------
+POST http://localhost:8080/api/auth/registro
+
+Cuerpo:
+{
+  "usuario": "elisa@test.com",
+  "password": "secreto123",
+  "nombre": "Elisa"            (opcional)
+}
+
+Respuestas:
+201 Created   {"mensaje":"Usuario registrado correctamente","usuario":"elisa@test.com"}
+400 Bad Request {"mensaje":"Datos inválidos","errores":["..."]}
+409 Conflict  {"mensaje":"Usuario ya existe con email: 'elisa@test.com'"}
+
+------------------------------------------------------------
+2) INICIO DE SESIÓN
+------------------------------------------------------------
+POST http://localhost:8080/api/auth/login
+
+Cuerpo:
+{
+  "usuario": "elisa@test.com",
+  "password": "secreto123"
+}
+
+Respuestas:
+200 OK            {"mensaje":"Autenticación satisfactoria","usuario":"elisa@test.com"}
+401 Unauthorized  {"mensaje":"Error en la autenticación"}
+400 Bad Request   {"mensaje":"Datos inválidos","errores":["..."]}
+
+------------------------------------------------------------
+Archivos de Postman (carpeta docs/postman del repositorio)
+------------------------------------------------------------
+- MiFinanzApp-API-Auth.postman_collection.json   Colección con 8 pruebas y 18 verificaciones
+- MiFinanzApp-Local.postman_environment.json     Entorno con la variable baseUrl
+
+Cómo importarlos: Postman > Import > seleccionar ambos archivos > elegir el entorno
+"Mi FinanzApp - Local" (arriba a la derecha) > Runner > ejecutar la colección en orden.

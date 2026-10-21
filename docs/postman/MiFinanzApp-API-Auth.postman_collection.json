@@ -1,0 +1,160 @@
+{
+  "info": {
+    "name": "Mi FinanzApp - API Auth (AA5-EV02)",
+    "description": "Pruebas del servicio web de registro e inicio de sesión. Ejecutar en orden (Runner): el primer request genera un usuario único y los demás lo reutilizan.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "usuario", "value": "" },
+    { "key": "password", "value": "secreto123" }
+  ],
+  "item": [
+    {
+      "name": "1. Registro correcto (201)",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": { "type": "text/javascript", "exec": [
+            "// Usuario único por ejecución para poder repetir la colección sin choques",
+            "pm.collectionVariables.set('usuario', 'postman_' + Date.now() + '@test.com');"
+          ] }
+        },
+        {
+          "listen": "test",
+          "script": { "type": "text/javascript", "exec": [
+            "pm.test('Código 201 Created', () => pm.response.to.have.status(201));",
+            "pm.test('Mensaje de registro correcto', () => pm.expect(pm.response.json().mensaje).to.eql('Usuario registrado correctamente'));",
+            "pm.test('Devuelve el usuario y no la contraseña', () => {",
+            "  const j = pm.response.json();",
+            "  pm.expect(j.usuario).to.eql(pm.collectionVariables.get('usuario'));",
+            "  pm.expect(j).to.not.have.property('password');",
+            "});"
+          ] }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"usuario\": \"{{usuario}}\",\n  \"password\": \"{{password}}\",\n  \"nombre\": \"Usuario Postman\"\n}" },
+        "url": { "raw": "{{baseUrl}}/api/auth/registro", "host": ["{{baseUrl}}"], "path": ["api", "auth", "registro"] }
+      }
+    },
+    {
+      "name": "2. Registro de usuario repetido (409)",
+      "event": [{
+        "listen": "test",
+        "script": { "type": "text/javascript", "exec": [
+          "pm.test('Código 409 Conflict', () => pm.response.to.have.status(409));",
+          "pm.test('Informa que el usuario ya existe', () => pm.expect(pm.response.json().mensaje).to.include('ya existe'));"
+        ] }
+      }],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"usuario\": \"{{usuario}}\",\n  \"password\": \"{{password}}\"\n}" },
+        "url": { "raw": "{{baseUrl}}/api/auth/registro", "host": ["{{baseUrl}}"], "path": ["api", "auth", "registro"] }
+      }
+    },
+    {
+      "name": "3. Registro con datos inválidos (400)",
+      "event": [{
+        "listen": "test",
+        "script": { "type": "text/javascript", "exec": [
+          "pm.test('Código 400 Bad Request', () => pm.response.to.have.status(400));",
+          "pm.test('Lista los errores de validación', () => {",
+          "  const j = pm.response.json();",
+          "  pm.expect(j.mensaje).to.eql('Datos inválidos');",
+          "  pm.expect(j.errores).to.be.an('array').that.is.not.empty;",
+          "});"
+        ] }
+      }],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"usuario\": \"no-es-un-email\",\n  \"password\": \"123\"\n}" },
+        "url": { "raw": "{{baseUrl}}/api/auth/registro", "host": ["{{baseUrl}}"], "path": ["api", "auth", "registro"] }
+      }
+    },
+    {
+      "name": "4. Login correcto (200)",
+      "event": [{
+        "listen": "test",
+        "script": { "type": "text/javascript", "exec": [
+          "pm.test('Código 200 OK', () => pm.response.to.have.status(200));",
+          "pm.test('Autenticación satisfactoria', () => pm.expect(pm.response.json().mensaje).to.eql('Autenticación satisfactoria'));",
+          "pm.test('Responde en menos de 2 segundos', () => pm.expect(pm.response.responseTime).to.be.below(2000));"
+        ] }
+      }],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"usuario\": \"{{usuario}}\",\n  \"password\": \"{{password}}\"\n}" },
+        "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"] }
+      }
+    },
+    {
+      "name": "5. Login con contraseña incorrecta (401)",
+      "event": [{
+        "listen": "test",
+        "script": { "type": "text/javascript", "exec": [
+          "pm.test('Código 401 Unauthorized', () => pm.response.to.have.status(401));",
+          "pm.test('Error en la autenticación', () => pm.expect(pm.response.json().mensaje).to.eql('Error en la autenticación'));"
+        ] }
+      }],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"usuario\": \"{{usuario}}\",\n  \"password\": \"contraseña-incorrecta\"\n}" },
+        "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"] }
+      }
+    },
+    {
+      "name": "6. Login con usuario inexistente (401)",
+      "event": [{
+        "listen": "test",
+        "script": { "type": "text/javascript", "exec": [
+          "pm.test('Código 401 Unauthorized', () => pm.response.to.have.status(401));",
+          "pm.test('Mismo mensaje que con contraseña incorrecta', () => pm.expect(pm.response.json().mensaje).to.eql('Error en la autenticación'));"
+        ] }
+      }],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"usuario\": \"nadie@test.com\",\n  \"password\": \"{{password}}\"\n}" },
+        "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"] }
+      }
+    },
+    {
+      "name": "7. Login sin campos (400)",
+      "event": [{
+        "listen": "test",
+        "script": { "type": "text/javascript", "exec": [
+          "pm.test('Código 400 Bad Request', () => pm.response.to.have.status(400));",
+          "pm.test('Indica los campos obligatorios', () => pm.expect(pm.response.json().errores).to.have.lengthOf(2));"
+        ] }
+      }],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{}" },
+        "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"] }
+      }
+    },
+    {
+      "name": "8. Login con JSON mal formado (400)",
+      "event": [{
+        "listen": "test",
+        "script": { "type": "text/javascript", "exec": [
+          "pm.test('Código 400 Bad Request', () => pm.response.to.have.status(400));",
+          "pm.test('Pide un JSON válido', () => pm.expect(pm.response.json().mensaje).to.eql('El cuerpo debe ser un JSON válido'));"
+        ] }
+      }],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "esto no es json" },
+        "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"] }
+      }
+    }
+  ]
+}
