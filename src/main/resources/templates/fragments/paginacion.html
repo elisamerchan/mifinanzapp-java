@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+<!--/* Fragmento compartido: controles de paginación para listados. */-->
 <body>
     <!-- pagina: índice base 0; url: ruta del listado (los demás parámetros de consulta se conservan) -->
     <nav th:fragment="paginacion(pagina, totalPaginas, url)" th:if="${totalPaginas > 1}" aria-label="Paginación">
