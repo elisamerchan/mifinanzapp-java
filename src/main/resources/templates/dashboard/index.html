@@ -11,7 +11,7 @@
         <!-- === ALERTAS === -->
         <div th:each="p : ${presupuestos}" th:if="${p.porcentaje >= 80}" class="alert d-flex align-items-center gap-2" th:classappend="${p.excedido} ? 'alert-danger' : 'alert-warning'" role="alert">
             <span aria-hidden="true" th:text="${p.excedido} ? '🚨' : '⚠️'"></span>
-            <span th:text="${p.excedido} ? ('Superaste el presupuesto de ' + p.categoria + ' (' + p.porcentaje + '%).') : ('Llevas el ' + p.porcentaje + '% del presupuesto de ' + p.categoria + '.')"></span>
+            <span th:text="${p.excedido} ? ('Superaste el presupuesto de ' + ${p.categoria} + ' (' + ${p.porcentaje} + '%).') : ('Llevas el ' + ${p.porcentaje} + '% del presupuesto de ' + ${p.categoria} + '.')"></span>
         </div>
         <div th:if="${not #lists.isEmpty(recordatoriosPendientes)}" class="alert alert-info" role="alert">
             <div class="fw-semibold mb-1">🔔 Recordatorios pendientes</div>

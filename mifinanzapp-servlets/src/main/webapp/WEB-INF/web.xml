@@ -9,6 +9,16 @@
         <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>
 
+    <!-- Los JSP y fragmentos están guardados en UTF-8: sin esto Tomcat los lee con el juego de caracteres
+         del sistema y las tildes se ven mal. -->
+    <jsp-config>
+        <jsp-property-group>
+            <url-pattern>*.jsp</url-pattern>
+            <url-pattern>*.jspf</url-pattern>
+            <page-encoding>UTF-8</page-encoding>
+        </jsp-property-group>
+    </jsp-config>
+
     <session-config>
         <session-timeout>30</session-timeout>
     </session-config>
