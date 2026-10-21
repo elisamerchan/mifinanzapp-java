@@ -1,0 +1,23 @@
+$kind: http-request
+url: "{{baseUrl}}/api/auth/registro"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "usuario": "no-es-un-email",
+      "password": "123"
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Código 400 Bad Request', () => pm.response.to.have.status(400));
+      pm.test('Lista los errores de validación', () => {
+        const j = pm.response.json();
+        pm.expect(j.mensaje).to.eql('Datos inválidos');
+        pm.expect(j.errores).to.be.an('array').that.is.not.empty;
+      });
+    language: text/javascript
+order: 3000

@@ -1,0 +1,5 @@
+$kind: collection
+description: "Pruebas del servicio web de registro e inicio de sesión. Ejecutar en orden (Runner): el primer request genera un usuario único y los demás lo reutilizan."
+variables:
+  usuario: ""
+  password: secreto123

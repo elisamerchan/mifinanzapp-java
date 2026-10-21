@@ -1,0 +1,79 @@
+ENDPOINTS DE LA API - Mi FinanzApp (GA7-220501096-AA5-EV04)
+Aprendiz: Elisa Nohemi Merchan Carrillo
+Repositorio: https://github.com/elisamerchan/mifinanzapp-java
+
+URL base (local): http://localhost:8080
+Formato: JSON (Content-Type: application/json)
+Documentacion interactiva (Swagger): http://localhost:8080/swagger-ui.html
+Especificacion OpenAPI:              http://localhost:8080/v3/api-docs
+
+Autenticacion: /api/auth/** es publico. Todos los demas endpoints exigen HTTP Basic
+(usuario = email y contrasena con los que se registro la cuenta). Sin credenciales: 401.
+
+------------------------------------------------------------
+AUTENTICACION (publico)
+------------------------------------------------------------
+POST   /api/auth/registro            Registra un usuario            201 / 400 / 409
+POST   /api/auth/login               Verifica credenciales          200 / 400 / 401
+
+------------------------------------------------------------
+CATEGORIAS
+------------------------------------------------------------
+GET    /api/categorias[?tipo=GASTO|INGRESO]   Lista               200
+GET    /api/categorias/{id}                   Consulta             200 / 404
+POST   /api/categorias                        Crea                 201 / 400
+PUT    /api/categorias/{id}                   Actualiza            200 / 400 / 404
+DELETE /api/categorias/{id}                   Elimina              204 / 400 / 404
+
+------------------------------------------------------------
+GASTOS
+------------------------------------------------------------
+GET    /api/gastos[?pagina=0]                 Lista paginada       200
+GET    /api/gastos?desde=AAAA-MM-DD&hasta=AAAA-MM-DD   Lista por rango   200
+GET    /api/gastos/{id}                       Consulta             200 / 404
+POST   /api/gastos                            Registra             201 / 400 / 404
+PUT    /api/gastos/{id}                       Actualiza            200 / 400 / 404
+DELETE /api/gastos/{id}                       Elimina              204 / 404
+
+------------------------------------------------------------
+INGRESOS
+------------------------------------------------------------
+GET    /api/ingresos[?pagina=0]               Lista paginada       200
+GET    /api/ingresos?desde=AAAA-MM-DD&hasta=AAAA-MM-DD  Lista por rango  200
+GET    /api/ingresos/{id}                     Consulta             200 / 404
+POST   /api/ingresos                          Registra             201 / 400 / 404
+PUT    /api/ingresos/{id}                     Actualiza            200 / 400 / 404
+DELETE /api/ingresos/{id}                     Elimina              204 / 404
+
+------------------------------------------------------------
+PRESUPUESTOS
+------------------------------------------------------------
+GET    /api/presupuestos                      Lista con progreso   200
+GET    /api/presupuestos/{id}                 Consulta             200 / 404
+POST   /api/presupuestos                      Crea                 201 / 400 / 409
+PUT    /api/presupuestos/{id}                 Actualiza            200 / 400 / 404 / 409
+DELETE /api/presupuestos/{id}                 Elimina              204 / 404
+
+------------------------------------------------------------
+RECORDATORIOS
+------------------------------------------------------------
+GET    /api/recordatorios                     Lista                200
+GET    /api/recordatorios/{id}                Consulta             200 / 404
+POST   /api/recordatorios                     Crea                 201 / 400
+PUT    /api/recordatorios/{id}                Actualiza            200 / 400 / 404
+PATCH  /api/recordatorios/{id}/completar      Alterna completado   200 / 404
+DELETE /api/recordatorios/{id}                Elimina              204 / 404
+
+------------------------------------------------------------
+RESUMEN
+------------------------------------------------------------
+GET    /api/resumen                           Totales del mes y balance   200
+
+Cuerpos de ejemplo y respuestas: docs/api-auth.md y docs/api-recursos.md
+
+------------------------------------------------------------
+Archivos de Postman (carpeta docs/postman del repositorio)
+------------------------------------------------------------
+- MiFinanzApp-API-Completa.postman_collection.json   51 peticiones, 76 verificaciones
+- MiFinanzApp-Local.postman_environment.json          Variable baseUrl
+Importar en Postman > elegir el entorno "Mi FinanzApp - Local" > Runner > ejecutar en orden.

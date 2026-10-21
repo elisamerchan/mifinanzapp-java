@@ -1,0 +1,30 @@
+$kind: http-request
+url: "{{baseUrl}}/api/auth/registro"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "usuario": "{{usuario}}",
+      "password": "{{password}}",
+      "nombre": "Usuario Postman"
+    }
+scripts:
+  - type: beforeRequest
+    code: |-
+      // Usuario único por ejecución para poder repetir la colección sin choques
+      pm.collectionVariables.set('usuario', 'postman_' + Date.now() + '@test.com');
+    language: text/javascript
+  - type: afterResponse
+    code: |-
+      pm.test('Código 201 Created', () => pm.response.to.have.status(201));
+      pm.test('Mensaje de registro correcto', () => pm.expect(pm.response.json().mensaje).to.eql('Usuario registrado correctamente'));
+      pm.test('Devuelve el usuario y no la contraseña', () => {
+        const j = pm.response.json();
+        pm.expect(j.usuario).to.eql(pm.collectionVariables.get('usuario'));
+        pm.expect(j).to.not.have.property('password');
+      });
+    language: text/javascript
+order: 1000

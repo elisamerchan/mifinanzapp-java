@@ -1,0 +1,19 @@
+$kind: http-request
+url: "{{baseUrl}}/api/auth/login"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "usuario": "{{usuario}}",
+      "password": "contraseña-incorrecta"
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Código 401 Unauthorized', () => pm.response.to.have.status(401));
+      pm.test('Error en la autenticación', () => pm.expect(pm.response.json().mensaje).to.eql('Error en la autenticación'));
+    language: text/javascript
+order: 5000

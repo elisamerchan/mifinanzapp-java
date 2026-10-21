@@ -1,6 +1,8 @@
 package com.mifinanzapp.api;
 
 import com.mifinanzapp.exception.DuplicateResourceException;
+import com.mifinanzapp.exception.ResourceNotFoundException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -37,6 +39,24 @@ public class ApiExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<Map<String, Object>> handleJsonInvalido(HttpMessageNotReadableException ex) {
         return ResponseEntity.badRequest().body(Map.of("mensaje", "El cuerpo debe ser un JSON válido"));
+    }
+
+    /** Recurso inexistente o de otro usuario: 404. */
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleNoEncontrado(ResourceNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("mensaje", ex.getMessage()));
+    }
+
+    /** Regla de negocio incumplida (categoría de otro tipo, categoría con movimientos...): 400. */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, Object>> handleReglaNegocio(IllegalArgumentException ex) {
+        return ResponseEntity.badRequest().body(Map.of("mensaje", ex.getMessage()));
+    }
+
+    /** Parámetro de ruta o de consulta con formato inválido (id no numérico, fecha mal escrita): 400. */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<Map<String, Object>> handleParametroInvalido(MethodArgumentTypeMismatchException ex) {
+        return ResponseEntity.badRequest().body(Map.of("mensaje", "Parámetro inválido: " + ex.getName()));
     }
 
     /** Usuario ya registrado: 409. */

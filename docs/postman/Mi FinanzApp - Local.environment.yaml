@@ -1,0 +1,4 @@
+name: Mi FinanzApp - Local
+values:
+  - key: baseUrl
+    value: 'http://localhost:8080'

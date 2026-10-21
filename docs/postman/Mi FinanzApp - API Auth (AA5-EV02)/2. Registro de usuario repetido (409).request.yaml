@@ -1,0 +1,19 @@
+$kind: http-request
+url: "{{baseUrl}}/api/auth/registro"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "usuario": "{{usuario}}",
+      "password": "{{password}}"
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Código 409 Conflict', () => pm.response.to.have.status(409));
+      pm.test('Informa que el usuario ya existe', () => pm.expect(pm.response.json().mensaje).to.include('ya existe'));
+    language: text/javascript
+order: 2000

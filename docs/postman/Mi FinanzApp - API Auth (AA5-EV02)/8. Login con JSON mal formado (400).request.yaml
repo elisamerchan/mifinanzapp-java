@@ -1,0 +1,15 @@
+$kind: http-request
+url: "{{baseUrl}}/api/auth/login"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: esto no es json
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Código 400 Bad Request', () => pm.response.to.have.status(400));
+      pm.test('Pide un JSON válido', () => pm.expect(pm.response.json().mensaje).to.eql('El cuerpo debe ser un JSON válido'));
+    language: text/javascript
+order: 8000

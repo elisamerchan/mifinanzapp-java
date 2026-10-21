@@ -3,6 +3,8 @@
 ## [Sin publicar] — Camino al MVP
 
 ### API
+- Servicios REST de categorías, ingresos, gastos, presupuestos, recordatorios y resumen bajo `/api/**` (HTTP Basic sin estado, errores en JSON). Documentación OpenAPI en `/swagger-ui.html`. Ver `docs/api-recursos.md`.
+- Colección de Postman de la API completa (`docs/postman/MiFinanzApp-API-Completa.postman_collection.json`).
 - Servicio web de registro e inicio de sesión: `POST /api/auth/registro` y `POST /api/auth/login` (JSON, sin CSRF). Ver `docs/api-auth.md`.
 
 ### Seguridad

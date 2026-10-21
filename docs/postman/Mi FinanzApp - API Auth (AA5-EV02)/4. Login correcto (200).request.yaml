@@ -1,0 +1,20 @@
+$kind: http-request
+url: "{{baseUrl}}/api/auth/login"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "usuario": "{{usuario}}",
+      "password": "{{password}}"
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Código 200 OK', () => pm.response.to.have.status(200));
+      pm.test('Autenticación satisfactoria', () => pm.expect(pm.response.json().mensaje).to.eql('Autenticación satisfactoria'));
+      pm.test('Responde en menos de 2 segundos', () => pm.expect(pm.response.responseTime).to.be.below(2000));
+    language: text/javascript
+order: 4000
