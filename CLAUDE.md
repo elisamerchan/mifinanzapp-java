@@ -18,7 +18,7 @@ $env:JAVA_HOME = "C:\Program Files\Java\jdk-17"
 pnpm install                        # only to refresh vendor assets (postinstall runs scripts/copy-vendor.js)
 ```
 
-Tests are plain JUnit 5 + Mockito unit tests on services (constructor-injected mocks, no Spring context), so they don't need a database.
+Tests never touch PostgreSQL: service tests are plain JUnit 5 + Mockito (constructor-injected mocks), `IngresoJdbcRepositoryTest` runs the real SQL on in-memory H2 (PostgreSQL mode), and `FlujoWebTest` boots the full context with MockMvc on H2 (`src/test/resources/application.properties`).
 
 ## Configuration
 
@@ -28,11 +28,11 @@ Tests are plain JUnit 5 + Mockito unit tests on services (constructor-injected m
 
 ## Architecture
 
-Classic layered MVC under `com.mifinanzapp`: `controller` → `service` → `repository` (Spring Data JPA) → `entity`, plus `dto`/`mapper` (only for Gasto, Ingreso, user registration), `exception`, `security`, `util` (`DateUtils`, `MonetaryUtils`).
+Classic layered MVC under `com.mifinanzapp`: `controller` → `service` → `repository` (Spring Data JPA, plus `IngresoJdbcRepository` with explicit `JdbcTemplate` SQL for the incomes CRUD) → `entity`, plus `dto`/`mapper` (only for Gasto, Ingreso, user registration), `exception`, `security`, `util` (`DateUtils`, `MonetaryUtils`).
 
 - **Multi-tenancy by user**: every entity belongs to a `Usuario`. Controllers take `Authentication auth`, resolve the user with `usuarioService.buscarPorEmail(auth.getName())` (email = username), and pass `usuario.getId()` to services/repositories. New queries must filter by `usuarioId`.
-- **Controllers are server-rendered, not REST**: GET returns a Thymeleaf view (`"gastos/index"`), forms POST to `/<recurso>/guardar` then `redirect:`; edit is `GET /<recurso>/editar/{id}` (reuses the index view with the form pre-filled), delete is `GET /<recurso>/eliminar/{id}`.
-- **Security** (`config/SecurityConfig`): form login at `/auth/login` (success → `/dashboard`), logout at `/auth/logout`, `/auth/**` and static paths public, everything else authenticated. CSRF is disabled. Passwords use BCrypt; `security/CustomUserDetailsService` loads users by email.
+- **Controllers are server-rendered, not REST**: GET returns a Thymeleaf view (`"gastos/index"`), forms POST to `/<recurso>/guardar` then `redirect:`; edit is `GET /<recurso>/editar/{id}` (reuses the index view with the form pre-filled), delete is `POST /<recurso>/eliminar/{id}` (a GET must never modify data).
+- **Security** (`config/SecurityConfig`): form login at `/auth/login` (success → `/dashboard`), logout at `/auth/logout` (POST), `/auth/**` and static paths public, everything else authenticated. CSRF is enabled: forms must use `th:action` so Thymeleaf adds the token. Passwords use BCrypt; `security/CustomUserDetailsService` loads users by email.
 - **Registration** (`UsuarioService.registrar`) also seeds the user's default categories; it throws `DuplicateResourceException` for an existing email.
 - **Categories** have a `TipoCategoria` (INGRESO/GASTO); forms list only the matching type via `categoriaService.listarPorTipo`.
 - **Dashboard caching**: `DashboardService` methods are `@Cacheable("dashboard")` with keys like `#usuarioId + '-ingresos'` (Caffeine, 2 min TTL, `config/CacheConfig`). Every write in `GastoService`, `IngresoService`, `PresupuestoService` has `@CacheEvict(value = "dashboard", allEntries = true)`. Add the same eviction to any new write path that affects dashboard figures.
