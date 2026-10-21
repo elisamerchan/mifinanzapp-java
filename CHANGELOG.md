@@ -2,6 +2,9 @@
 
 ## [Sin publicar] — Camino al MVP
 
+### API
+- Servicio web de registro e inicio de sesión: `POST /api/auth/registro` y `POST /api/auth/login` (JSON, sin CSRF). Ver `docs/api-auth.md`.
+
 ### Seguridad
 - Autorización por propietario en ingresos, gastos, categorías, presupuestos y recordatorios: editar, borrar o sobrescribir un registro ajeno devuelve 404.
 - Al guardar se valida que la categoría sea del usuario y del tipo correcto (INGRESO/GASTO).

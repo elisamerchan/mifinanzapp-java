@@ -87,6 +87,22 @@ public class UsuarioService {
         }
     }
 
+    /**
+     * Comprueba usuario y contraseña contra el hash BCrypt almacenado.
+     *
+     * @param email    usuario (email) recibido
+     * @param password contraseña en texto plano
+     * @return {@code true} solo si el usuario existe y la contraseña coincide
+     */
+    @Transactional(readOnly = true)
+    public boolean autenticar(String email, String password) {
+        boolean valido = usuarioRepository.findByEmail(email)
+                .map(u -> passwordEncoder.matches(password, u.getPassword()))
+                .orElse(false);
+        log.info("autenticar_usuario email={} exito={}", email, valido);
+        return valido;
+    }
+
     public Usuario buscarPorEmail(String email) {
         return usuarioRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario", "email", email));

@@ -43,9 +43,11 @@ public class SecurityConfig {
         http
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/", "/css/**", "/js/**", "/vendor/**", "/img/**").permitAll()
-                .requestMatchers("/auth/**").permitAll()
+                .requestMatchers("/auth/**", "/api/auth/**").permitAll()
                 .anyRequest().authenticated()
             )
+            // El servicio web no usa formularios Thymeleaf, por lo que no lleva token CSRF
+            .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"))
             .formLogin(form -> form
                 .loginPage("/auth/login")
                 .loginProcessingUrl("/auth/login")
