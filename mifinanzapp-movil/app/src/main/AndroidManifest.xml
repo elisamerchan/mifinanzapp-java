@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Mínimo privilegio: la aplicación no solicita ningún permiso; sus datos son locales. -->
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/Tema.MiFinanzApp">
+
+        <!-- Pantalla de inicio: única actividad visible para el lanzador de Android -->
+        <activity
+            android:name=".ui.MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".ui.MovimientosActivity" android:exported="false" />
+        <activity android:name=".ui.FormularioMovimientoActivity" android:exported="false" />
+        <activity android:name=".ui.CategoriasActivity" android:exported="false" />
+        <activity android:name=".ui.PresupuestosActivity" android:exported="false" />
+        <activity android:name=".ui.RecordatoriosActivity" android:exported="false" />
+    </application>
+
+</manifest>

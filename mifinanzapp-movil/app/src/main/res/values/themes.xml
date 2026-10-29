@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Tema.MiFinanzApp" parent="@android:style/Theme.Material.Light.DarkActionBar">
+        <item name="android:colorPrimary">@color/primario</item>
+        <item name="android:colorPrimaryDark">@color/primario_oscuro</item>
+        <item name="android:colorAccent">@color/primario</item>
+    </style>
+</resources>

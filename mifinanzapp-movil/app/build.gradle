@@ -1,0 +1,33 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.mifinanzapp.movil'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.mifinanzapp.movil"
+        minSdk 24
+        targetSdk 34
+        versionCode 2
+        versionName "2.0"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    // La aplicación usa solo el framework de Android (sin librerías de terceros en producción).
+    testImplementation 'junit:junit:4.13.2'
+    // SQLite en la JVM, para probar el esquema y las consultas SQL sin un dispositivo.
+    testImplementation 'org.xerial:sqlite-jdbc:3.46.0.0'
+}

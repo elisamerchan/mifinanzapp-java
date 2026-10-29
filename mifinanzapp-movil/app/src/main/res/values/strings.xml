@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Mi FinanzApp</string>
+    <string name="etiqueta_ingresos">Ingresos</string>
+    <string name="etiqueta_gastos">Gastos</string>
+    <string name="etiqueta_balance">Balance disponible</string>
+    <string name="menu_ingresos">Ingresos</string>
+    <string name="menu_gastos">Gastos</string>
+    <string name="menu_categorias">Categorías</string>
+    <string name="menu_presupuestos">Presupuestos</string>
+    <string name="menu_recordatorios">Recordatorios</string>
+    <string name="lista_vacia">Aún no hay registros</string>
+    <string name="etiqueta_monto">Monto</string>
+    <string name="etiqueta_fecha">Fecha (toca para elegir)</string>
+    <string name="etiqueta_descripcion">Descripción (opcional)</string>
+    <string name="etiqueta_categoria">Categoría</string>
+    <string name="ejemplo_monto">Ej: 25000</string>
+    <string name="boton_guardar">Guardar</string>
+    <string name="boton_cancelar">Cancelar</string>
+</resources>
